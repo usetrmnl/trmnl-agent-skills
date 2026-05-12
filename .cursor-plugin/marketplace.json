@@ -1,0 +1,21 @@
+{
+  "name": "trmnl-agent-skills",
+  "owner": {
+    "name": "TRMNL",
+    "email": "hello@trmnl.com"
+  },
+  "metadata": {
+    "description": "Verbatim mirror of TRMNL's production AI assistant prompts, packaged as a Cursor plugin",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "trmnl",
+      "source": "./dist/cursor",
+      "description": "TRMNL agent skill",
+      "version": "0.1.0",
+      "category": "developer-tools",
+      "tags": ["trmnl", "epaper", "plugins", "skills"]
+    }
+  ]
+}

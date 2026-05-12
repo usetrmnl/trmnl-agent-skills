@@ -1,0 +1,19 @@
+{
+  "name": "trmnl",
+  "version": "0.1.0",
+  "description": "TRMNL agent skill — verbatim mirror of core AI assistant prompts",
+  "author": {
+    "name": "TRMNL"
+  },
+  "homepage": "https://github.com/usetrmnl/trmnl-agent-skills",
+  "repository": "https://github.com/usetrmnl/trmnl-agent-skills",
+  "license": "MIT",
+  "keywords": [
+    "trmnl",
+    "e-ink",
+    "display",
+    "plugins",
+    "agent-skills"
+  ],
+  "skills": "./skills/"
+}

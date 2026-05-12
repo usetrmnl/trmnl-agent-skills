@@ -13,16 +13,34 @@ Most installs are `git clone` then `cp -r` to copy both the main file AND its si
 
 This reads [`.claude-plugin/marketplace.json`](../.claude-plugin/marketplace.json) and installs the bundled plugin manifest at `dist/claude-code/.claude-plugin/plugin.json`. The skill plus all references are copied into your Claude config.
 
-## Cursor
+## Cursor (2.5+)
+
+The plugin ships skills only (`SKILL.md` + references) — MCP is a separate one-time setup.
 
 ```bash
-git clone --depth 1 https://github.com/usetrmnl/trmnl-agent-skills /tmp/trmnl
-cp -r /tmp/trmnl/dist/cursor/.cursor/* .cursor/
+git clone https://github.com/usetrmnl/trmnl-agent-skills ~/Documents/GitHub/trmnl-agent-skills
+mkdir -p ~/.cursor/plugins/local
+ln -sfn ~/Documents/GitHub/trmnl-agent-skills/dist/cursor ~/.cursor/plugins/local/trmnl
 ```
 
-This copies BOTH `.cursor/rules/trmnl.mdc` AND `.cursor/refs/*.md`. The rule references `../refs/<name>.md` relatively, so the refs must sit in `.cursor/refs/` (which the cp above ensures).
+Restart Cursor. The plugin shows up under Settings → Plugins. Edits to your clone are picked up on next Cursor restart — useful if you're contributing back.
 
-The rule uses **Agent Requested mode** (description-driven). It activates when you mention TRMNL in a Cursor chat. To always-apply, edit the `.mdc` frontmatter and set `alwaysApply: true`.
+### Wire up the TRMNL MCP server (optional, for live plugin operations)
+
+The skill works offline as a design reference without MCP. To unlock live operations (read/write markup, screenshots, merge variable inspection), edit `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` (per-project) and add:
+
+```json
+{
+  "mcpServers": {
+    "trmnl": {
+      "url": "https://trmnl.com/mcp?api_key=<your-key>",
+      "type": "http"
+    }
+  }
+}
+```
+
+Get your key from TRMNL dashboard → any plugin → settings → MCP. Merge this alongside any other MCP servers you already have. Restart Cursor. Check Settings → Tools & MCP for a green `trmnl` indicator.
 
 ## Codex
 
@@ -83,7 +101,11 @@ Then restart Claude Code so the new skill files load. `marketplace update` re-pu
 
 Need to start over from scratch? `/plugin uninstall trmnl` then `/plugin marketplace remove trmnl-agent-skills`, then re-run the install commands at the top of this file.
 
-### Cursor, Codex, Gemini, Copilot
+### Cursor (2.5+)
+
+Cursor manages plugin updates and removal through the **Settings → Plugins** panel. Open it, find `trmnl`, and click update or remove. To reinstall after removal, re-run the install steps at the top of this file. Restart Cursor afterward.
+
+### Codex, Gemini, Copilot
 
 Re-run the same install commands — they overwrite the previous files in place:
 
@@ -101,7 +123,7 @@ The single `SKILL.md`/main-file body is what each harness loads on trigger. The 
 | Harness | Main file location | Refs location | How agents access refs |
 |---|---|---|---|
 | Claude Code | `~/.claude/skills/trmnl/SKILL.md` | `~/.claude/skills/trmnl/references/` | Native progressive disclosure (Anthropic Skills standard) |
-| Cursor | `.cursor/rules/trmnl.mdc` | `.cursor/refs/` | Agent reads via filesystem when SKILL.md links cite them |
+| Cursor (2.5+) | `<plugin-root>/skills/trmnl/SKILL.md` | `<plugin-root>/skills/trmnl/references/` | Native plugin skill discovery (Cursor 2.5+ Plugin spec) |
 | Codex | `AGENTS.md` (project root) | `refs/` (project root) | Agent reads via filesystem |
 | Gemini | `GEMINI.md` (project root) | `refs/` (project root) | Agent reads via filesystem (or use `@./refs/<name>.md` for explicit imports) |
 | Copilot | `.github/instructions/trmnl.instructions.md` | `.github/refs/` | Agent reads via filesystem |

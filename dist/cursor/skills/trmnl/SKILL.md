@@ -1,13 +1,11 @@
 ---
-description: Use when working on anything TRMNL — building plugins, writing or editing
-  markup, designing layouts using the TRMNL CSS framework, calling the TRMNL MCP server
-  (mcp__trmnl__*), or any task that mentions "trmnl", "e-ink display", "trmnl.com",
-  "TRMNL plugin", "Liquid markup", "image-dither", "title_bar", or screen sizes 800x480
-  / 800x240 / 400x480 / 400x240. References embed the production prompts TRMNL's external
-  MCP server ships — agent rules, the full design system template guide, and the framework
-  v3 supplement.
-globs: ''
-alwaysApply: false
+name: trmnl
+description: Use when working on anything TRMNL — building plugins, writing or editing markup, designing layouts using the TRMNL CSS framework, calling the TRMNL MCP server (mcp__trmnl__*), or any task that mentions "trmnl", "e-ink display", "trmnl.com", "TRMNL plugin", "Liquid markup", "image-dither", "title_bar", or screen sizes 800x480 / 800x240 / 400x480 / 400x240. References embed the production prompts TRMNL's external MCP server ships — agent rules, the full design system template guide, and the framework v3 supplement.
+license: MIT
+metadata:
+  version: 0.1.0
+  framework_version: v3
+  source: https://github.com/usetrmnl/trmnl-agent-skills
 ---
 
 # TRMNL
@@ -18,9 +16,9 @@ Everything you need to work on TRMNL. The references in this skill are **verbati
 
 | # | Reference | What it covers | Lines |
 |---|---|---|---|
-| 1 | [`references/agent_prompt.md`](../refs/agent_prompt.md) | Core rules: data-first hard gate, mandatory workflows, view dimensions, layout system, image dithering, no-custom-styles, no-emojis, common mistakes. **This is also what TRMNL's MCP server ships as the connection-level instructions to every external client.** | 427 |
-| 2 | [`references/template_guide.md`](../refs/template_guide.md) | THE design system reference — every framework class, layout pattern, chart code, item component, custom-fields YAML schema. Bundled here so non-MCP users can read it offline; MCP-connected users can also fetch it via the design-system template-guide tool. | 2710 |
-| 3 | [`references/framework_v3_guide.md`](../refs/framework_v3_guide.md) | v3 supplement: chromatic palette, CSS variables, label variants. v3.0.3+ specific. | 230 |
+| 1 | [`references/agent_prompt.md`](references/agent_prompt.md) | Core rules: data-first hard gate, mandatory workflows, view dimensions, layout system, image dithering, no-custom-styles, no-emojis, common mistakes. **This is also what TRMNL's MCP server ships as the connection-level instructions to every external client.** | 427 |
+| 2 | [`references/template_guide.md`](references/template_guide.md) | THE design system reference — every framework class, layout pattern, chart code, item component, custom-fields YAML schema. Bundled here so non-MCP users can read it offline; MCP-connected users can also fetch it via the design-system template-guide tool. | 2710 |
+| 3 | [`references/framework_v3_guide.md`](references/framework_v3_guide.md) | v3 supplement: chromatic palette, CSS variables, label variants. v3.0.3+ specific. | 230 |
 
 ## Adding the TRMNL MCP server (optional)
 
@@ -29,10 +27,11 @@ The skill works standalone — agents read the bundled references to write TRMNL
 1. **Get your API key:** TRMNL dashboard → any plugin → settings → MCP tab.
 2. **Register the server with your agent:**
 
-   | Agent | Command / config |
+   | Agent | Setup |
    |---|---|
    | Claude Code | `claude mcp add --transport http trmnl "https://trmnl.com/mcp?api_key=<api-key>"` |
-   | Cursor, Codex, Gemini, generic | Add to your MCP config JSON: `{"mcpServers": {"trmnl": {"url": "https://trmnl.com/mcp?api_key=<api-key>"}}}` |
+   | Cursor | Edit `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` (per-project) and add: `{"mcpServers": {"trmnl": {"url": "https://trmnl.com/mcp?api_key=<api-key>", "type": "http"}}}` — restart Cursor afterward. |
+   | Codex, Gemini, generic | Add to your MCP config JSON: `{"mcpServers": {"trmnl": {"url": "https://trmnl.com/mcp?api_key=<api-key>"}}}` |
 
 3. **Verify:** ask your agent to list TRMNL MCP tools — you should see `MarkupsReadTool`, `MarkupsWriteTool`, `MarkupsScreenshotTool`, etc.
 
@@ -89,5 +88,3 @@ These files are LARGE. Read selectively:
 - Need a specific framework class or layout pattern? → search `template_guide.md` directly.
 
 Don't load all 3 files at once unless you have to. Each is independently useful.
-
-> Reference files are bundled in `../refs/` next to this rule. Open them with your editor or have your agent read them on demand.

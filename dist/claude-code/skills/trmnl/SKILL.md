@@ -27,10 +27,11 @@ The skill works standalone — agents read the bundled references to write TRMNL
 1. **Get your API key:** TRMNL dashboard → any plugin → settings → MCP tab.
 2. **Register the server with your agent:**
 
-   | Agent | Command / config |
+   | Agent | Setup |
    |---|---|
    | Claude Code | `claude mcp add --transport http trmnl "https://trmnl.com/mcp?api_key=<api-key>"` |
-   | Cursor, Codex, Gemini, generic | Add to your MCP config JSON: `{"mcpServers": {"trmnl": {"url": "https://trmnl.com/mcp?api_key=<api-key>"}}}` |
+   | Cursor | Edit `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` (per-project) and add: `{"mcpServers": {"trmnl": {"url": "https://trmnl.com/mcp?api_key=<api-key>", "type": "http"}}}` — restart Cursor afterward. |
+   | Codex, Gemini, generic | Add to your MCP config JSON: `{"mcpServers": {"trmnl": {"url": "https://trmnl.com/mcp?api_key=<api-key>"}}}` |
 
 3. **Verify:** ask your agent to list TRMNL MCP tools — you should see `MarkupsReadTool`, `MarkupsWriteTool`, `MarkupsScreenshotTool`, etc.
 

@@ -102,30 +102,27 @@ def emit_claude_code(skills)
   skills.each { |s| FileUtils.cp_r(s[:dir], File.join(out, 'skills')) }
 end
 
-# --- cursor: rules/<name>.mdc + .cursor/refs/ + .cursor/assets/ -------------
+# --- cursor: plugin manifest + skills/ + mcp.json (Cursor 2.5+) ------------
 
 def emit_cursor(skills)
-  cursor_dir = File.join(DIST_DIR, 'cursor', '.cursor')
-  rules_dir  = File.join(cursor_dir, 'rules')
-  refs_dir   = File.join(cursor_dir, 'refs')
-  assets_dir = File.join(cursor_dir, 'assets')
+  out = File.join(DIST_DIR, 'cursor')
 
-  skills.each do |skill|
-    fm    = skill[:frontmatter]
-    cmeta = fm.dig('metadata', 'cursor') || {}
-    head  = {
-      'description' => fm['description'],
-      'globs'       => cmeta['globs'] || '',
-      'alwaysApply' => cmeta['alwaysApply'] || false
-    }
-    body  = rewrite_links(skill[:body], refs_prefix: '../refs/', assets_prefix: '../assets/')
-    note  = "\n\n> Reference files are bundled in `../refs/` next to this rule. " \
-            "Open them with your editor or have your agent read them on demand.\n"
-    filename = skill[:name].start_with?('trmnl') ? skill[:name] : "trmnl-#{skill[:name]}"
-    write_file(File.join(rules_dir, "#{filename}.mdc"),
-               "---\n#{yaml_block(head)}---\n\n#{body}#{note}")
-    copy_skill_subdirs(skill, refs_dir, assets_dir)
-  end
+  manifest = {
+    'name'        => 'trmnl',
+    'version'     => PLUGIN_VER,
+    'description' => 'TRMNL agent skill — verbatim mirror of core AI assistant prompts',
+    'author'      => { 'name' => 'TRMNL' },
+    'homepage'    => REPO_URL,
+    'repository'  => REPO_URL,
+    'license'     => 'MIT',
+    'keywords'    => %w[trmnl e-ink display plugins agent-skills],
+    'skills'      => './skills/'
+  }
+  write_file(File.join(out, '.cursor-plugin', 'plugin.json'),
+             JSON.pretty_generate(manifest) + "\n")
+
+  FileUtils.mkdir_p(File.join(out, 'skills'))
+  skills.each { |s| FileUtils.cp_r(s[:dir], File.join(out, 'skills')) }
 end
 
 # --- codex / gemini: AGENTS.md / GEMINI.md + sibling refs/ ------------------
