@@ -1,0 +1,10 @@
+.DS_Store
+*.swp
+*.swo
+.idea/
+.vscode/
+.bundle/
+vendor/
+tmp/
+.ruby-version
+.tool-versions

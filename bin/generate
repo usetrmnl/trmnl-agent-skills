@@ -1,0 +1,238 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Generates per-harness skill outputs into dist/ from skills/<name>/SKILL.md.
+# Targets: Claude Code, Cursor, Codex CLI, Gemini CLI, GitHub Copilot.
+#
+# Each non-Claude harness gets its references/ and assets/ bundled into a
+# sibling directory (refs/ and assets/) with relative links rewritten to
+# match. Claude Code keeps the original skills/<name>/{references,assets}/
+# layout because its plugin format expects it.
+#
+# Usage: bin/generate [TRMNL_DIST_DIR=/tmp/foo]
+
+require 'yaml'
+require 'fileutils'
+require 'json'
+
+ROOT       = File.expand_path('..', __dir__)
+SOURCE_DIR = File.join(ROOT, 'skills')
+DIST_DIR   = ENV.fetch('TRMNL_DIST_DIR', File.join(ROOT, 'dist'))
+REPO_URL   = 'https://github.com/usetrmnl/trmnl-agent-skills'
+PLUGIN_VER = '0.1.0'
+
+# --- skill parsing -----------------------------------------------------------
+
+def parse_skill(skill_dir)
+  name = File.basename(skill_dir)
+  raw  = File.read(File.join(skill_dir, 'SKILL.md'))
+  m    = raw.match(/\A---\n(.*?)\n---\n(.*)\z/m)
+  raise "Missing frontmatter in #{skill_dir}/SKILL.md" unless m
+
+  { name:        name,
+    dir:         skill_dir,
+    frontmatter: YAML.safe_load(m[1], permitted_classes: [Symbol]),
+    body:        m[2].strip }
+end
+
+def all_skills
+  Dir.glob(File.join(SOURCE_DIR, '*'))
+     .select { |f| File.directory?(f) }
+     .sort
+     .map    { |d| parse_skill(d) }
+end
+
+# --- helpers ----------------------------------------------------------------
+
+# Rewrites markdown links from references/foo.md and assets/foo to use the
+# given prefixes. Pass relative paths like '../refs/' or 'refs/' depending on
+# where the calling file sits relative to the bundled refs.
+def rewrite_links(body, refs_prefix:, assets_prefix:)
+  body
+    .gsub(/\]\(references\/([^)]+)\)/) { "](#{refs_prefix}#{Regexp.last_match(1)})" }
+    .gsub(/\]\(assets\/([^)]+)\)/)     { "](#{assets_prefix}#{Regexp.last_match(1)})" }
+end
+
+# Copies references/ and assets/ subdirs from a skill into the given dests.
+# Flat layout (no per-skill namespacing) — assumes filenames don't collide
+# across skills. With multiple skills that share names, add skill_name dirs.
+def copy_skill_subdirs(skill, refs_dest, assets_dest)
+  { 'references' => refs_dest, 'assets' => assets_dest }.each do |sub, dest|
+    src = File.join(skill[:dir], sub)
+    next unless File.directory?(src)
+
+    FileUtils.mkdir_p(dest)
+    FileUtils.cp_r(Dir.glob("#{src}/*"), dest)
+  end
+end
+
+def yaml_block(hash)
+  hash.to_yaml.sub(/\A---\n/, '').rstrip + "\n"
+end
+
+def write_file(path, content)
+  FileUtils.mkdir_p(File.dirname(path))
+  File.write(path, content)
+end
+
+def reset_dist
+  FileUtils.rm_rf(DIST_DIR)
+  FileUtils.mkdir_p(DIST_DIR)
+end
+
+# --- claude-code: plugin manifest + verbatim skills/ ------------------------
+
+def emit_claude_code(skills)
+  out = File.join(DIST_DIR, 'claude-code')
+
+  manifest = {
+    'name'        => 'trmnl',
+    'version'     => PLUGIN_VER,
+    'description' => 'TRMNL agent skill — verbatim mirror of core AI assistant prompts',
+    'homepage'    => REPO_URL,
+    'repository'  => REPO_URL,
+    'license'     => 'MIT',
+    'keywords'    => %w[trmnl e-ink display plugins agent-skills],
+    'skills'      => './skills/'
+  }
+  write_file(File.join(out, '.claude-plugin', 'plugin.json'),
+             JSON.pretty_generate(manifest) + "\n")
+
+  FileUtils.mkdir_p(File.join(out, 'skills'))
+  skills.each { |s| FileUtils.cp_r(s[:dir], File.join(out, 'skills')) }
+end
+
+# --- cursor: rules/<name>.mdc + .cursor/refs/ + .cursor/assets/ -------------
+
+def emit_cursor(skills)
+  cursor_dir = File.join(DIST_DIR, 'cursor', '.cursor')
+  rules_dir  = File.join(cursor_dir, 'rules')
+  refs_dir   = File.join(cursor_dir, 'refs')
+  assets_dir = File.join(cursor_dir, 'assets')
+
+  skills.each do |skill|
+    fm    = skill[:frontmatter]
+    cmeta = fm.dig('metadata', 'cursor') || {}
+    head  = {
+      'description' => fm['description'],
+      'globs'       => cmeta['globs'] || '',
+      'alwaysApply' => cmeta['alwaysApply'] || false
+    }
+    body  = rewrite_links(skill[:body], refs_prefix: '../refs/', assets_prefix: '../assets/')
+    note  = "\n\n> Reference files are bundled in `../refs/` next to this rule. " \
+            "Open them with your editor or have your agent read them on demand.\n"
+    filename = skill[:name].start_with?('trmnl') ? skill[:name] : "trmnl-#{skill[:name]}"
+    write_file(File.join(rules_dir, "#{filename}.mdc"),
+               "---\n#{yaml_block(head)}---\n\n#{body}#{note}")
+    copy_skill_subdirs(skill, refs_dir, assets_dir)
+  end
+end
+
+# --- codex / gemini: AGENTS.md / GEMINI.md + sibling refs/ ------------------
+
+def aggregated_markdown(skills, title, harness, refs_prefix:, assets_prefix:)
+  doc = +"# #{title}\n\nAuto-generated for the #{harness} from #{REPO_URL}.\n\n"
+  doc << "Reference files are bundled in `#{refs_prefix.chomp('/')}/` next to this file. " \
+         "Read them as needed.\n\n"
+  if skills.size > 1
+    doc << "Available skills:\n\n"
+    skills.each { |s| doc << "- **#{s[:name]}** — #{s[:frontmatter]['description']}\n" }
+    doc << "\n---\n\n"
+  end
+  skills.each do |skill|
+    body = rewrite_links(skill[:body], refs_prefix: refs_prefix, assets_prefix: assets_prefix)
+           .sub(/\A# .+?\n+/, '')
+    doc << (skills.size > 1 ? "## #{skill[:name]}\n\n" : '')
+    doc << "#{body}\n\n"
+  end
+  doc
+end
+
+def emit_codex(skills)
+  out = File.join(DIST_DIR, 'codex')
+  doc = aggregated_markdown(skills, 'TRMNL Agent Skills', 'OpenAI Codex CLI',
+                            refs_prefix: 'refs/', assets_prefix: 'assets/')
+  write_file(File.join(out, 'AGENTS.md'), doc)
+  skills.each { |s| copy_skill_subdirs(s, File.join(out, 'refs'), File.join(out, 'assets')) }
+end
+
+def emit_gemini(skills)
+  out = File.join(DIST_DIR, 'gemini')
+  doc = aggregated_markdown(skills, 'TRMNL Agent Skills', 'Gemini CLI',
+                            refs_prefix: 'refs/', assets_prefix: 'assets/')
+  # Gemini natively supports `@./path.md` imports that inline file content
+  # into the context at session load. Append an imports block so each ref
+  # is auto-loaded exactly once (body markdown links stay for readability).
+  doc += gemini_imports_section(skills)
+  write_file(File.join(out, 'GEMINI.md'), doc)
+  skills.each { |s| copy_skill_subdirs(s, File.join(out, 'refs'), File.join(out, 'assets')) }
+end
+
+def gemini_imports_section(skills)
+  refs = skills.flat_map do |skill|
+    refs_dir = File.join(skill[:dir], 'references')
+    File.directory?(refs_dir) ? Dir.glob(File.join(refs_dir, '*')).sort.map { |f| File.basename(f) } : []
+  end.uniq
+  return '' if refs.empty?
+
+  header = <<~HEADER
+    ---
+
+    ## Auto-loaded references
+
+    The body above links to these reference files for readability. The imports
+    below tell Gemini to inline their content into context at session start, so
+    the agent has the full TRMNL design system available without on-demand reads.
+
+  HEADER
+  header + refs.map { |name| "@./refs/#{name}" }.join("\n") + "\n"
+end
+
+# --- copilot: index + per-skill instructions + .github/refs/ ---------------
+
+def emit_copilot(skills)
+  out        = File.join(DIST_DIR, 'copilot', '.github')
+  refs_dir   = File.join(out, 'refs')
+  assets_dir = File.join(out, 'assets')
+
+  index = +"# TRMNL Agent Skills\n\n"
+  index << "Auto-generated for GitHub Copilot from #{REPO_URL}.\n\n"
+  index << "Reference files are bundled in `refs/` next to this file. " \
+           "When working with TRMNL, the following skill instructions apply " \
+           "(see `instructions/<name>.instructions.md` for each):\n\n"
+  skills.each do |skill|
+    apply_to = skill[:frontmatter].dig('metadata', 'copilot', 'applyTo') || '**'
+    index << "- **#{skill[:name]}** (applies to `#{apply_to}`) — #{skill[:frontmatter]['description']}\n"
+  end
+  write_file(File.join(out, 'copilot-instructions.md'), index)
+
+  skills.each do |skill|
+    fm       = skill[:frontmatter]
+    apply_to = fm.dig('metadata', 'copilot', 'applyTo') || '**'
+    head     = { 'applyTo' => apply_to, 'description' => fm['description'] }
+    # instructions/ live one level deeper than refs/, so the prefix climbs out.
+    body     = rewrite_links(skill[:body], refs_prefix: '../refs/', assets_prefix: '../assets/')
+    write_file(File.join(out, 'instructions', "#{skill[:name]}.instructions.md"),
+               "---\n#{yaml_block(head)}---\n\n#{body}\n")
+    copy_skill_subdirs(skill, refs_dir, assets_dir)
+  end
+end
+
+# --- main -------------------------------------------------------------------
+
+def main
+  skills = all_skills
+  raise 'No skills found in skills/' if skills.empty?
+
+  reset_dist
+  emit_claude_code(skills)
+  emit_cursor(skills)
+  emit_codex(skills)
+  emit_gemini(skills)
+  emit_copilot(skills)
+
+  puts "Generated #{skills.size} skill(s) into #{DIST_DIR}"
+  skills.each { |s| puts "  - #{s[:name]}" }
+end
+
+main if $PROGRAM_NAME == __FILE__

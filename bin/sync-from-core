@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# Syncs verbatim reference files from the TRMNL core repo.
+# Usage:
+#   bin/sync-from-core                    # finds core via $TRMNL_CORE_PATH or sibling dir
+#   TRMNL_CORE_PATH=/path/to/core bin/sync-from-core
+#
+# After sync, run bin/generate to regenerate dist/.
+
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+DEFAULT_CORE="$(dirname "$REPO_ROOT")/core"
+CORE="${TRMNL_CORE_PATH:-$DEFAULT_CORE}"
+
+if [[ ! -d "$CORE" ]]; then
+  echo "TRMNL core repo not found locally" >&2
+  echo "set TRMNL_CORE_PATH=/path/to/core or place core/ as a sibling of this repo" >&2
+  exit 1
+fi
+
+DST="$REPO_ROOT/skills/trmnl/references"
+
+# copy_with_banner <internal_source_path> <dest_filename> <human_description>
+copy_with_banner() {
+  local src="$1" dst="$2" description="$3"
+  if [[ ! -f "$src" ]]; then
+    echo "  missing source for: $description" >&2
+    exit 1
+  fi
+  {
+    printf '<!--\nVERBATIM copy from TRMNL core (do NOT hand-edit).\nSource: TRMNL core — %s\nKeep in sync via: bin/sync-from-core\n-->\n\n' "$description"
+    cat "$src"
+  } > "$DST/$dst"
+  echo "  $dst ($(wc -l < "$src" | tr -d ' ') lines) — $description"
+}
+
+echo "syncing reference files from TRMNL core"
+copy_with_banner "$CORE/app/services/ai_assistant/agent_prompt.md"        "agent_prompt.md"        "AI assistant agent rules"
+copy_with_banner "$CORE/app/services/ai_assistant/framework_v3_guide.md"  "framework_v3_guide.md"  "framework v3 supplement"
+copy_with_banner "$CORE/app/tools/design_system/template_guide.md"        "template_guide.md"      "design system template guide"
+
+echo ""
+echo "✓ sync complete. now run: bin/generate"

@@ -1,0 +1,21 @@
+{
+  "name": "trmnl-agent-skills",
+  "owner": {
+    "name": "TRMNL",
+    "url": "https://trmnl.com"
+  },
+  "metadata": {
+    "description": "Verbatim mirror of TRMNL's production AI assistant prompts, packaged as an agent skill",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "trmnl",
+      "source": "./dist/claude-code",
+      "description": "TRMNL agent skill",
+      "version": "0.1.0",
+      "category": "developer-tools",
+      "tags": ["trmnl", "epaper", "plugins", "skills"]
+    }
+  ]
+}
