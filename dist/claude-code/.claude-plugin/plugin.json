@@ -1,7 +1,7 @@
 {
   "name": "trmnl",
-  "version": "0.1.0",
-  "description": "TRMNL agent skill — verbatim mirror of core AI assistant prompts",
+  "version": "0.2.0",
+  "description": "TRMNL agent skill and MCP server — build plugins and manage your account from your editor",
   "homepage": "https://github.com/usetrmnl/trmnl-agent-skills",
   "repository": "https://github.com/usetrmnl/trmnl-agent-skills",
   "license": "MIT",

@@ -11,11 +11,11 @@ Most installs are `git clone` then `cp -r` to copy both the main file AND its si
 /plugin install trmnl@trmnl-agent-skills
 ```
 
-This reads [`.claude-plugin/marketplace.json`](../.claude-plugin/marketplace.json) and installs the bundled plugin manifest at `dist/claude-code/.claude-plugin/plugin.json`. The skill plus all references are copied into your Claude config.
+This reads [`.claude-plugin/marketplace.json`](../.claude-plugin/marketplace.json) and installs the bundled plugin manifest at `dist/claude-code/.claude-plugin/plugin.json`. The skill plus all references are copied into your Claude config, and the plugin's `.mcp.json` adds the `trmnl` MCP server. Its first use opens a browser to sign you in to TRMNL — the same sign-in the Cursor section below describes.
 
 ## Cursor (2.5+)
 
-The plugin ships skills only (`SKILL.md` + references) — MCP is a separate one-time setup.
+The plugin ships the skill and the TRMNL MCP server.
 
 ```bash
 git clone https://github.com/usetrmnl/trmnl-agent-skills ~/trmnl-agent-skills
@@ -25,9 +25,15 @@ ln -sfn ~/trmnl-agent-skills/dist/cursor ~/.cursor/plugins/local/trmnl
 
 Restart Cursor. The plugin shows up under Settings → Plugins. Edits to your clone are picked up on next Cursor restart — useful if you're contributing back.
 
-### Wire up the TRMNL MCP server (optional, for live plugin operations)
+### Sign in to the MCP server
 
-The skill works offline as a design reference without MCP. To unlock live operations (read/write markup, screenshots, merge variable inspection), edit `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` (per-project) and add:
+The plugin's `mcp.json` points at `https://trmnl.com/mcp` with no credential. The first time the agent reaches for a TRMNL tool, Cursor opens a browser to sign you in to TRMNL and asks which scopes to grant: `read` (list and inspect your devices, playlists and plugin settings) or `read` and `write` (change them, edit markup, push data). Nothing to paste. Check Settings → Tools & MCP for a green `trmnl` indicator.
+
+Signed in, the agent gets the account tools: devices, playlists, plugin settings, markup and your profile, each action an operation of the [TRMNL REST API](https://trmnl.com/api-docs).
+
+### Or connect one plugin with its MCP key
+
+To scope an agent to a single plugin's markup instead — the flow the in-app editor offers — put that plugin's MCP key in the URL. Get it from TRMNL dashboard → the plugin → settings → MCP, then in `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` (per-project):
 
 ```json
 {
@@ -40,7 +46,7 @@ The skill works offline as a design reference without MCP. To unlock live operat
 }
 ```
 
-Get your key from TRMNL dashboard → any plugin → settings → MCP. Merge this alongside any other MCP servers you already have. Restart Cursor. Check Settings → Tools & MCP for a green `trmnl` indicator.
+A keyed connection sees only that plugin's tools; the account tools need the sign-in above.
 
 ## opencode
 

@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "Verbatim mirror of TRMNL's production AI assistant prompts, packaged as a Cursor plugin",
-    "version": "0.1.0"
+    "version": "0.2.0"
   },
   "plugins": [
     {
       "name": "trmnl",
       "source": "./dist/cursor",
-      "description": "TRMNL agent skill",
-      "version": "0.1.0",
+      "description": "TRMNL agent skill and MCP server",
+      "version": "0.2.0",
       "category": "developer-tools",
       "tags": ["trmnl", "epaper", "plugins", "skills"]
     }

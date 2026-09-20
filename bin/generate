@@ -19,7 +19,10 @@ ROOT       = File.expand_path('..', __dir__)
 SOURCE_DIR = File.join(ROOT, 'skills')
 DIST_DIR   = ENV.fetch('TRMNL_DIST_DIR', File.join(ROOT, 'dist'))
 REPO_URL   = 'https://github.com/usetrmnl/trmnl-agent-skills'
-PLUGIN_VER = '0.1.0'
+PLUGIN_VER = '0.2.0'
+
+# The MCP server carries no credential: it answers 401 and the harness signs the user in over OAuth.
+MCP_SERVERS = { 'mcpServers' => { 'trmnl' => { 'url' => 'https://trmnl.com/mcp' } } }.freeze
 
 # --- skill parsing -----------------------------------------------------------
 
@@ -88,7 +91,7 @@ def emit_claude_code(skills)
   manifest = {
     'name'        => 'trmnl',
     'version'     => PLUGIN_VER,
-    'description' => 'TRMNL agent skill — verbatim mirror of core AI assistant prompts',
+    'description' => 'TRMNL agent skill and MCP server — build plugins and manage your account from your editor',
     'homepage'    => REPO_URL,
     'repository'  => REPO_URL,
     'license'     => 'MIT',
@@ -97,6 +100,8 @@ def emit_claude_code(skills)
   }
   write_file(File.join(out, '.claude-plugin', 'plugin.json'),
              JSON.pretty_generate(manifest) + "\n")
+
+  write_file(File.join(out, '.mcp.json'), JSON.pretty_generate(MCP_SERVERS) + "\n")
 
   FileUtils.mkdir_p(File.join(out, 'skills'))
   skills.each { |s| FileUtils.cp_r(s[:dir], File.join(out, 'skills')) }
@@ -110,7 +115,7 @@ def emit_cursor(skills)
   manifest = {
     'name'        => 'trmnl',
     'version'     => PLUGIN_VER,
-    'description' => 'TRMNL agent skill — verbatim mirror of core AI assistant prompts',
+    'description' => 'TRMNL agent skill and MCP server — build plugins and manage your account from your editor',
     'author'      => { 'name' => 'TRMNL' },
     'homepage'    => REPO_URL,
     'repository'  => REPO_URL,
@@ -120,6 +125,7 @@ def emit_cursor(skills)
   }
   write_file(File.join(out, '.cursor-plugin', 'plugin.json'),
              JSON.pretty_generate(manifest) + "\n")
+  write_file(File.join(out, 'mcp.json'), JSON.pretty_generate(MCP_SERVERS) + "\n")
 
   FileUtils.mkdir_p(File.join(out, 'skills'))
   skills.each { |s| FileUtils.cp_r(s[:dir], File.join(out, 'skills')) }
