@@ -6,8 +6,24 @@ Keep in sync via: bin/sync-from-core
 
 # Framework v3 — Agent Guide
 
-> **applies to:** plugins on framework v3.x
+> **applies to:** plugins on framework v3.x (v3.0.0+, currently v3.0.3)
 > **purpose:** supplements `agent_prompt.md` and the base template guide. all existing rules, workflows, tool usage, and gates still apply. this document is the authoritative source for v3-specific colors, grayscale scale, and label variants — when the base guide defers to "the framework supplement," it means this file.
+
+---
+
+## framework version context
+
+the TRMNL design system framework is now at v3.0.3. key releases:
+
+| version | date | what changed |
+|---------|------|-------------|
+| 2.3.7 | 2026-03-20 | last v2 release (fixed font asset URLs) |
+| 3.0.0 | 2026-04-01 | color support, CSS variable architecture, extended grayscale |
+| 3.0.1 | 2026-04-03 | fix: `data-fit-value` glyph metrics tolerance (prevents false text shrinking) |
+| 3.0.2 | 2026-04-03 | fix: gap utility CSS ordering (gap now loads after flex/grid) |
+| 3.0.3 | 2026-04-07 | asset refresh (release notes pending) |
+
+---
 
 ## color system
 
@@ -151,6 +167,26 @@ only after the migration is verified, ask the user if they want color enhancemen
 - Liquid template logic, merge variables, data flow — unchanged
 
 the migration is a CSS class migration. don't restructure templates unless the user asks.
+
+---
+
+## v3.0.1 fix: `data-fit-value` tolerance
+
+the fit-value JS was overly aggressive — sub-pixel glyph metrics differences could trigger false overflow detection, causing text to shrink to `minFontSize` unnecessarily.
+
+**fix:** added a 2px layout slack constant that scales with `devicePixelRatio`. also: when `data-value-fit-max-height` is not set, height overflow checks are now disabled (width-only fitting).
+
+**for the agent:** continue using `data-fit-value="true"` as before. the fix is transparent — text should now fit more reliably without unexpected shrinking.
+
+---
+
+## v3.0.2 fix: gap utility ordering
+
+gap utilities (`gap--small`, `gap--medium`, etc.) depend on flex and grid being defined first in the CSS cascade. v3.0.0 had them in the wrong order.
+
+**fix:** `gap` import moved after `flexbox` and `grid` in the SCSS index.
+
+**for the agent:** no markup changes needed. `gap` classes now work correctly alongside flex and grid layouts.
 
 ---
 

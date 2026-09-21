@@ -42,6 +42,8 @@ The skill works offline as a design reference without MCP. To unlock live operat
 
 Get your key from TRMNL dashboard → any plugin → settings → MCP. Merge this alongside any other MCP servers you already have. Restart Cursor. Check Settings → Tools & MCP for a green `trmnl` indicator.
 
+For the whole account (devices, playlists, every plugin setting) instead of one plugin, drop `?api_key=` and Cursor prompts an OAuth sign-in on first use. Account access is opening account by account — see the "Adding the TRMNL MCP server" section of [`SKILL.md`](../skills/trmnl/SKILL.md).
+
 ## opencode
 
 opencode reads the Anthropic Agent Skills format natively, so there's no opencode-specific build — it installs the same `dist/claude-code/skills/trmnl` directory verbatim.
@@ -84,6 +86,8 @@ Same trade-off as Cursor — the skill works offline as a design reference witho
 ```
 
 Get your key from TRMNL dashboard → any plugin → settings → MCP. Merge this alongside any other MCP servers you already have, then restart opencode.
+
+For the whole account instead of one plugin, drop `?api_key=` and run `opencode mcp auth trmnl` for the OAuth sign-in (it registers itself, no client id needed), or use your account API key from <https://trmnl.com/account>. Account access is opening account by account — see [`SKILL.md`](../skills/trmnl/SKILL.md).
 
 ## Codex
 

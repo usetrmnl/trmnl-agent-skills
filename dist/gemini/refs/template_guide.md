@@ -71,7 +71,7 @@ custom_fields:
 ```
 
 ### transforms (data reshaping)
-optional. reshapes API response before it reaches Liquid. for `polling` and `webhook` plugins only — **static plugins do NOT support transforms** (reshape your `static_data` JSON directly).
+optional. reshapes API response before it reaches Liquid. for `polling`, `webhook` and `static` plugins. **async_polling plugins never run transforms**.
 
 **always prefer transforms over complex Liquid logic.** a transform keeps templates clean and reduces payload size. if you find yourself writing verbose Liquid loops, filters, or nested conditionals — write a transform instead.
 
@@ -197,6 +197,40 @@ function transform(input) {
 - **returning `{}` or `[]`** — empty returns silently kill the template. if unsure, return `input` unchanged.
 - **network calls without error handling** — always resolve with `input` on failure so the template still has data.
 - **using top-level `await` in JS** — use `async function run()` (serverless) or `async function transform()` (default) instead.
+
+#### persistent state
+
+read `input.trmnl.state`, an object that survives between refreshes, empty `{}` on first run.
+write it by returning a reserved `trmnl_state` key; TRMNL strips that key out of the merge
+variables and stores it for the next run.
+
+```js
+async function run(input) {
+  const history = input.trmnl.state?.history || []
+  const today = new Date().toISOString().slice(0, 10)
+  const updated = [...history.filter(p => p.date !== today),
+                   { date: today, value: input.subscribers }].slice(-30)
+
+  return {
+    subscribers: input.subscribers,
+    trmnl_state: { history: updated }    // read by markup AND by the next run
+  }
+}
+```
+
+markup reads it as `{{ trmnl.state.history }}`, so an accumulator is stored once rather than
+returned twice. polling URLs, headers and bodies read it too:
+`https://api.example.com/events?since={{ trmnl.state.cursor | default: "" }}`
+
+**timing:** state is read at the START of a run and written at the END. the polling URL and the
+transform input both see the PREVIOUS run's state; markup sees what the transform just wrote.
+
+- limit 8kB. over that, the write is ignored, the previous state is kept, and an error is logged.
+- `trmnl_state` must be an object. anything else is ignored the same way.
+- polling, static and webhook strategies. async_polling never runs a transform.
+- `input.trmnl.previous_merge_variables` is what the last run stored for markup. read it to compare
+  against the previous value; returning it persists nothing, `trmnl_state` does.
+- forks and new installs start with empty state, so always guard with `?.` or `|| {}`.
 
 ---
 
@@ -438,7 +472,7 @@ sizes: `title--xsmall`, `title--small`, `title--base`, `title--medium`, `title--
 <span class="label">Temperature</span>
 <span class="label label--small">Updated 5m ago</span>
 <span class="label label--gray">Muted text</span>
-<span class="label label--inverted">White on black</span>
+<span class="label label--filled">White on black</span>
 <span class="label label--underline">Underlined</span>
 <span class="label label--outline">Outlined badge</span>
 ```
@@ -673,6 +707,13 @@ integrations: `data-content-limiter="true"` (auto-resize), `data-pixel-perfect="
 ```
 
 **on 1-bit**, `bg--gray-N` uses tiled bitmap patterns (`https://trmnl.com/images/grayscale/gray-N.png`) to simulate gray via dot density. on 4-bit, it uses real CSS colors. never use raw `background-color: gray` — it'll be crushed to pure black or white on 1-bit. never use CSS `opacity`, `box-shadow`, or `background: linear-gradient(...)` — they all posterize unpredictably.
+
+**a pattern and a fill cannot share one element.** `text--gray-N` paints its pattern through the shape of the glyphs, `bg--*` paints one across the box, and an element has one background that only one of them can use. put the fill on the box and the gray text on an element inside it:
+```html
+<div class="bg--white"><span class="text--gray-50">Mon 8/3</span></div>   <!-- correct -->
+<div class="bg--white text--gray-50">Mon 8/3</div>                        <!-- both want the one background -->
+```
+this only matters when the text shade is a pattern. `text--black` and `text--white` are real colors, so they sit on a fill with no trouble.
 
 ### visibility
 ```html
@@ -1938,7 +1979,7 @@ a user glances at their TRMNL for ~3 seconds. they should instantly understand:
 
 ### hard rules
 
-- **no custom styles** — never use inline `style="..."` attributes or `<style>` blocks. the framework provides all the classes you need. custom styles bypass the framework, break consistency, and won't render predictably on e-ink. the only exception: chart libraries (Highcharts/Chartkick) that require inline styles for rendering.
+- **no custom styles** — never use inline `style="..."` attributes or `<style>` blocks. the framework provides all the classes you need. custom styles bypass the framework, break consistency, and won't render predictably on e-ink. the only exception: chart libraries (Highcharts/Chartkick) and MapLibre GL JS (TRMNLMaps) that require inline styles for rendering.
 - **no emojis** — e-ink displays have no emoji font support. emoji characters render as missing glyphs (empty boxes). use text or SVG icons instead.
 - **image-dither on content images** — always add the `image-dither` class to `<img>` tags displaying photos, logos, or dynamic images: `<img class="image image-dither" src="...">`. without it, images look washed out on e-ink. the only exception is small title_bar icons (24×24 SVGs) which don't need dithering.
 
@@ -2610,8 +2651,8 @@ every field must have: `keyname`, `field_type`, `name`
 | `copyable_webhook_url` | webhook URL with copy button | auto-populated with plugin UUID |
 | `author_bio` | plugin README section | special keys: `category`, `github_url`, `learn_more_url`, `email_address`, `youtube_url` |
 | `plugin_instance_select` | dropdown of user's active plugin instances | requires `plugin_keyname`. for plugin_merge strategy |
-| `xhrSelect` | dynamic dropdown from external URL | requires `endpoint`. supports `depends_on` for chained dropdowns |
-| `xhrSelectSearch` | searchable dynamic dropdown | requires `endpoint`. search query sent as `query` param |
+| `xhrSelect` | dynamic dropdown from external URL | `endpoint:` fetches client-side (public URLs only); to call a server-side API with auth — e.g. sending the OAuth token — use a `remote:` block instead (see "authenticated dropdown" below). supports `depends_on` for chained dropdowns |
+| `xhrSelectSearch` | searchable dynamic dropdown | requires `endpoint`. search query sent as `query` param. POST (default) also sends sibling settings; `http_verb: get` sends only `function` and `query` — no other field values |
 
 ### examples
 
@@ -2664,6 +2705,24 @@ every field must have: `keyname`, `field_type`, `name`
   learn_more_url: https://trmnl.com
 ```
 
+**authenticated dropdown (xhrSelect via server-side `remote:`):**
+
+use a `remote:` block instead of `endpoint:` when the request must run on TRMNL's servers — e.g. to send an auth or OAuth token. TRMNL makes the call for you and substitutes `{{ oauth_access_token }}` once OAuth is connected (it also auto-refreshes the token). `endpoint:` fetches from the browser and cannot send server-side secrets.
+
+```yaml
+- keyname: calendar_id
+  field_type: xhrSelect
+  name: Calendar
+  remote:
+    url: https://www.googleapis.com/calendar/v3/users/me/calendarList
+    method: GET                 # default is POST
+    headers:
+      Authorization: "Bearer {{ oauth_access_token }}"
+    response_path: items        # dot-path to the array in the JSON response
+    label_field: summary        # shown to the user (also accepts a Liquid template, e.g. "{{ summary }}")
+    value_field: id             # stored in settings
+```
+
 ### conditional visibility
 
 attach `conditional_validation` to a parent field to show/hide or require other fields based on its value:
@@ -2707,3 +2766,88 @@ attach `conditional_validation` to a parent field to show/hide or require other 
 - `default` for select fields must match the **value** (lowercase), not the label.
 - `"Yes"` and `"No"` select defaults must be wrapped in quotes: `default: "no"`.
 - for real-world examples, fork published recipes at https://trmnl.com/recipes.
+
+## 20. MAPS (TRMNLMAPS + MAPLIBRE GL JS)
+
+TRMNL Framework 3.3 ships `TRMNLMaps`, a MapLibre GL JS adapter in the plugin runtime. It builds the map style from the framework's map slots, so a map takes dither tiles on 1-bit, solids on 4-bit, hues on a color panel and a theme's own tokens, and it renders as a still frame: no interaction, no animation. Full documentation: https://trmnl.com/framework/docs/3.3/map and https://trmnl.com/framework/docs/3.3/paint_maps.
+
+### setup (required in every map template)
+```html
+<!-- MapLibre GL JS and its stylesheet, hosted by TRMNL beside Highcharts -->
+<script src="https://trmnl.com/js/maplibre-gl/5.24.0/maplibre-gl.js"></script>
+<link href="https://trmnl.com/js/maplibre-gl/5.24.0/maplibre-gl.css" rel="stylesheet">
+
+<!-- an empty, id'd container with the map class; it fills whatever the layout hands it -->
+<div class="view view--full">
+  <div class="layout layout--col gap--small">
+    <div id="map" class="map stretch w--full"></div>
+  </div>
+  <div class="title_bar">
+    <img class="image image--adaptive" src="https://trmnl.com/images/plugins/trmnl--render.svg" alt="TRMNL">
+    <span class="title">Map</span>
+  </div>
+</div>
+```
+
+### building the map
+```html
+<script>
+  // TRMNLMaps arrives with the framework runtime, MapLibre with its own script tag: wait for both.
+  function whenReady(cb) {
+    var tries = 0;
+    (function attempt() {
+      if (window.TRMNLMaps && window.maplibregl) return cb();
+      if (++tries > 200) return;
+      setTimeout(attempt, 50);
+    })();
+  }
+
+  whenReady(function () {
+    var el = "map";
+    // watch() builds the map now and again when device, scale, mode, dark mode or theme change;
+    // options() carries the style for the preset and every handler and animation off.
+    TRMNLMaps.watch(el, function () {
+      return new maplibregl.Map(TRMNLMaps.options({
+        el: el, preset: "streets", center: [{{ lng }}, {{ lat }}], zoom: 13
+      }));
+    });
+  });
+</script>
+```
+
+### presets
+- `streets` — roads, water, parks, buildings and labels (the full map)
+- `minimal` — land, water and main roads, for a route to sit on
+- `outline` — coast, water, main roads and the big place names, for a small view
+- `blank` — the land alone, for your own overlays
+
+### plotting your own data (routes, markers, Strava)
+```javascript
+var coords = TRMNLMaps.decodePolyline("{{ activity.map.summary_polyline }}"); // [lng, lat] pairs
+TRMNLMaps.watch(el, function () {
+  var map = new maplibregl.Map(TRMNLMaps.options({ el: el, preset: "minimal" }));
+  map.on("load", function () {
+    TRMNLMaps.route(map, coords, { el: el, width: 4 });                       // ink, crisp fill
+    TRMNLMaps.dot(map, coords[0], { el: el, id: "start", radius: 5 });
+    TRMNLMaps.dot(map, coords[coords.length - 1], { el: el, id: "end", radius: 5, hollow: true });
+  });
+  TRMNLMaps.fit(map, coords, { padding: TRMNLPaint.px(20, { el: el }), maxZoom: 15 }); // integer zoom, no animation
+  return map;
+});
+```
+A second route takes the next step of the chart-series ramp: `TRMNLMaps.route(map, back, { el: el, id: "back", i: 1, n: 2 })`.
+
+### tiles and keys (who pays)
+- **default:** name nothing and the map fetches OpenStreetMap's public Shortbread tiles itself, on the free tier. Fine for a plugin on a few devices; the OSMF usage policy forbids fleet-scale traffic.
+- **the plugin's own source:** `TRMNLMaps.options({ el, preset, tiles: { url: "https://tiles.example.com/{z}/{x}/{y}.mvt?key={key}", key: "..." } })`. The url is a `{z}/{x}/{y}` template and `{key}` is filled from the key. Do not put a key in markup that other users can read; use the settings below.
+- **instance settings (preferred for keys):** every private plugin has a "Map tiles" group in its settings (`Map tiles URL`, `Map tiles key`, the key stored encrypted). The platform hands the pair to the map as `window.__TRMNL_MAPS__`; a map whose markup names no source uses it. A recipe author's pair renders for installs that set none (the author carries the cost); an install that sets its own pair uses that instead. A source named in code wins over both.
+- **TRMNL's own source:** `tiles: 'trmnl'`, for TRMNL-authored plugins and the docs only.
+- the style speaks the Shortbread tile schema (OSMF, VersaTiles, a self-hosted Shortbread build); OpenMapTiles sources need a style catalog the framework does not ship yet.
+
+### rules
+- **never animate or interact.** set the camera in `options()` or with `fit()`; never `flyTo`/`easeTo`. `options()` turns every handler off.
+- **always build inside `TRMNLMaps.watch()`** so the map rebuilds on a device, mode or theme change and the screenshot service can rebuild it at capture scale.
+- **readiness is automatic.** the framework holds `TRMNL_PLUGINS_READY` until the tiles, roads and labels have drawn; do not add your own timers.
+- **keep the OpenStreetMap credit.** `watch()` and `attach()` place a framework-styled "© OpenStreetMap contributors" label on every map; it is required by the ODbL.
+- **no custom styles**, same as everywhere: the `.map` container is sized by the layout (`stretch`, `w--full`, `h--*`), never by inline CSS.
+- **labels are framework labels**, not map glyphs; they take the screen's fonts and a text stroke, so do not add your own label elements over the canvas.
