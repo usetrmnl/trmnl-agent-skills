@@ -41,7 +41,7 @@ Whole-account access is opening account by account. Until yours has it, the OAut
 
 **Verify:** ask your agent to list TRMNL MCP tools. One plugin: `MarkupsReadTool`, `MarkupsWriteTool`, `MarkupsScreenshotTool`, etc. Whole account: `AccountDevicesTool`, `AccountPlaylistsTool`, `AccountPluginSettingsTool`, `AccountMarkupTool`, `AccountProfileTool`, `APIEndpointsSearchTool`.
 
-**Endpoint:** `POST https://trmnl.com/mcp`. Rate limit: 60 req / 60s. OAuth scopes: `read` (list and read only) and `write` (everything); clients ask for both unless told otherwise.
+**Endpoint:** `POST https://trmnl.com/mcp`. Rate limit: 60 req / 60s. OAuth scopes are capabilities: `read` (list and read), `content` (markup, plugin data and fields, playlists, creating plugin settings), `devices` (device settings, identify), `delete` (plugin settings, playlist items), `profile` (`getMe`). Ask for all five; the user ticks what they want at consent (`delete` and `profile` start unticked) and may limit the connection to some devices and plugin settings. `write` is the older name for `content` + `devices` + `delete`.
 
 ## Tool name mapping
 
@@ -82,6 +82,7 @@ Things that trip agents up:
 - A schedule window is `{"week_days": [1, 2], "start_time": "09:00", "end_time": "17:00"}` with `0` for Sunday. Keys the API does not know are dropped silently.
 - `updateDevice` refuses a `refresh_interval` outside 300–86400 with a 422 that names the range.
 - Another user's ids answer 404, never 403 — there is no way to tell "not yours" from "does not exist".
+- A 403 names what the connection lacks: a capability (`This connection lacks the devices capability`) or a device or plugin setting it was not granted. Do not retry; tell the user and ask them to widen it — connect again for a capability, Account → Connected agents for a device or plugin setting. A limited connection's `listDevices` and `listPluginSettings` show only what it was granted.
 
 ## What's in-app-only (translate or ignore)
 
