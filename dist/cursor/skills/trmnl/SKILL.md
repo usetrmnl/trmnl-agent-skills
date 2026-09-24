@@ -73,7 +73,7 @@ Each account tool takes an `action` (the REST API operation) and a `params` hash
 | `AccountDevicesTool` | `listDevices`, `getDevice`, `updateDevice`, `identifyDevice`, `getDeviceLogs`, `clearDevicePlaylist` (destructive) |
 | `AccountPluginSettingsTool` | `listPluginSettings`, `createPluginSetting`, `getPluginSettingDetails`, `updatePluginSettingFields`, `getPluginSettingData` (native plugins), `updatePluginSettingData` (webhook plugins), `getPluginSettingLogs`, `getMergeVariables` (private plugins), `getPluginSettingFiles` / `importPluginSettingFiles` (private plugins), `uploadPluginSettingImage` (webhook_image plugins, base64), `deletePluginSetting` |
 | `AccountMarkupTool` | `readMarkup`, `writeMarkup`, `startPreview` / `getPreview`, `startRefresh` / `getRefresh` (start answers a `job_id`, poll with get) |
-| `AccountPlaylistsTool` | `listDevicePlaylist`, `addDevicePlaylistItem`, `reorderDevicePlaylist`, `copyDevicePlaylist`, `listPlaylistItems`, `updatePlaylistItem`, `deletePlaylistItem`, `getPlaylistItemSchedule`, `replacePlaylistItemSchedule`, `refreshPlaylistItem`, `duplicatePlaylistItem`, `createDeviceMashup`, `getMashup`, `updateMashup` |
+| `AccountPlaylistsTool` | `listDevicePlaylist`, `addDevicePlaylistItem`, `reorderDevicePlaylist`, `copyDevicePlaylist`, `listPlaylistItems`, `updatePlaylistItem`, `deletePlaylistItem`, `getPlaylistItemSchedule`, `replacePlaylistItemSchedule`, `duplicatePlaylistItem`, `createDeviceMashup`, `getMashup`, `updateMashup` |
 | `AccountRecipesTool` | `searchRecipes`, `getRecipe`, `getRecipeMarkup`, `installRecipe` |
 | `APIEndpointsSearchTool` | search a catalog of free third-party APIs a private plugin can poll — not TRMNL's own API |
 
