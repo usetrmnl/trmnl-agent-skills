@@ -54,7 +54,7 @@ The references reference TRMNL tools two different ways depending on context. Ma
 | `show_merge_variables` | `MergeVariablesShowTool` |
 | `write_settings` | `IntegrationsWriteSettingsTool` |
 | `show_logs` | `IntegrationsLogsTool` |
-| `refresh_data` | `IntegrationsRefreshDataTool` (answers within 15s; for a slower fetch dispatch via `AsyncStartTool`) |
+| `refresh_data` | `IntegrationsRefreshDataTool` (answers within 15s; for a slower fetch dispatch via `AsyncStartTool`; 12 refreshes an hour per plugin setting, 30 on Plus) |
 | `read_markup` | `MarkupsReadTool` |
 | `write_markup` | `MarkupsWriteTool` |
 | `list_markup_sizes` | `MarkupsListSizesTool` |
@@ -83,6 +83,7 @@ Things that trip agents up:
 - `writeMarkup` lints the Liquid and warns on variables the plugin's data does not have — fetch data first (`startRefresh`) or push it (`updatePluginSettingData`), then write.
 - A schedule window is `{"week_days": [1, 2], "start_time": "09:00", "end_time": "17:00"}` with `0` for Sunday. Keys the API does not know are dropped silently.
 - `updateDevice` refuses a `refresh_interval` outside 300–86400 with a 422 that names the range.
+- A change that renders spends from the account's hourly render allowance (60, 180 on Plus), shared with the dashboard: `startPreview`, `startRefresh` on a setting that does not poll, a device appearance change (one render per playlist item), an item appearance change or showing a hidden item, a new plugin setting, a `refresh_interval` change, `copyDevicePlaylist` (one per plugin setting), `updateMashup` and a featured image (two). Past it the API answers 429 and nothing changes; do not retry, tell the user it opens again within the hour.
 - Another user's ids answer 404, never 403 — there is no way to tell "not yours" from "does not exist".
 - A 403 names what the connection lacks: a capability (`This connection lacks the devices capability`) or a device or plugin setting it was not granted. Do not retry; tell the user and ask them to widen it — connect again for a capability, Account → Connected agents for a device or plugin setting. A limited connection's `listDevices` and `listPluginSettings` show only what it was granted.
 
