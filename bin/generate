@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 # Generates per-harness skill outputs into dist/ from skills/<name>/SKILL.md.
-# Targets: Claude Code, Cursor, Codex CLI, Gemini CLI, GitHub Copilot.
+# Targets: Claude Code, Cursor, Codex CLI, Gemini CLI, GitHub Copilot, Hermes.
 #
 # Each non-Claude harness gets its references/ and assets/ bundled into a
 # sibling directory (refs/ and assets/) with relative links rewritten to
@@ -100,6 +100,14 @@ def emit_claude_code(skills)
 
   FileUtils.mkdir_p(File.join(out, 'skills'))
   skills.each { |s| FileUtils.cp_r(s[:dir], File.join(out, 'skills')) }
+end
+
+# --- hermes: native skills directory ----------------------------------------
+
+def emit_hermes(skills)
+  out = File.join(DIST_DIR, 'hermes', 'skills')
+  FileUtils.mkdir_p(out)
+  skills.each { |s| FileUtils.cp_r(s[:dir], out) }
 end
 
 # --- cursor: plugin manifest + skills/ + mcp.json (Cursor 2.5+) ------------
@@ -223,6 +231,7 @@ def main
 
   reset_dist
   emit_claude_code(skills)
+  emit_hermes(skills)
   emit_cursor(skills)
   emit_codex(skills)
   emit_gemini(skills)

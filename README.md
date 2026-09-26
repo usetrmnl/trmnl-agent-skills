@@ -1,6 +1,6 @@
 # trmnl-agent-skills
 
-A template writing agent skill for the [TRMNL](https://trmnl.com), packaged for Claude Code, Cursor, opencode, OpenAI Codex CLI, Gemini CLI, and GitHub Copilot. Pair it with TRMNL's hosted MCP server for live operations on one plugin (API key) or your whole account (OAuth) — setup is in [`skills/trmnl/SKILL.md`](skills/trmnl/SKILL.md#adding-the-trmnl-mcp-server-optional).
+A template writing agent skill for the [TRMNL](https://trmnl.com), packaged for Claude Code, Cursor, opencode, OpenAI Codex CLI, Gemini CLI, GitHub Copilot, and Hermes Agent. Pair it with TRMNL's hosted MCP server for live operations on one plugin (API key) or your whole account (OAuth) — setup is in [`skills/trmnl/SKILL.md`](skills/trmnl/SKILL.md#adding-the-trmnl-mcp-server-optional).
 
 The skill bundles three files copied verbatim from TRMNL's core repo, curated for the **external** agent context:
 
@@ -22,6 +22,7 @@ Source of truth: [`skills/trmnl/`](skills/trmnl/). Generated outputs (committed 
 | **OpenAI Codex** | drop `dist/codex/AGENTS.md` into your project root |
 | **Gemini CLI** | drop `dist/gemini/GEMINI.md` into your project root |
 | **GitHub Copilot** | copy `dist/copilot/.github/` into your repo |
+| **Hermes Agent** | copy or symlink `dist/hermes/skills/trmnl` into `$HERMES_HOME/skills/trmnl` (defaults to `~/.hermes/skills/trmnl`) |
 
 Full install: [`install/README.md`](install/README.md).
 
