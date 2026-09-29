@@ -328,7 +328,12 @@ to customize the title_bar icon, use **inline SVG or base64-encoded PNG** — ne
 | `trmnl.user.locale`, `.time_zone`, `.time_zone_iana`, `.utc_offset` | locale/timezone |
 | `trmnl.device.friendly_id`, `.percent_charged`, `.wifi_strength` | device status |
 | `trmnl.device.height`, `.width` | screen dimensions |
+| `trmnl.device.orientation`, `.model`, `.bit_depth` | `portrait`, `og_plus`, `2` (bit depth follows the chosen palette) |
+| `trmnl.device.firmware_version`, `.refresh_interval_seconds` | `1.6.3`, `900` (time between wakes) |
+| `trmnl.device.sleep_mode_enabled`, `.sleep_start_time`, `.sleep_end_time` | `true`, `1320`, `480` (minutes after local midnight) |
 | `trmnl.system.timestamp_utc` | current UTC time |
+| `trmnl.plugin_settings.data_fetched_utc` | UTC time of the fetch this screen shows |
+| `trmnl.plugin_settings.refresh_interval_minutes` | `15`, how often this plugin refreshes |
 | `trmnl.plugin_settings.instance_name`, `.strategy`, `.dark_mode` | plugin config |
 
 ### sensor readings (when available)

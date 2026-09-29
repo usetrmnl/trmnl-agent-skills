@@ -248,6 +248,10 @@ in your Liquid templates, data is available as top-level variables:
   - `trmnl.user.time_zone_iana` — user's timezone
   - `trmnl.user.utc_offset` — UTC offset in seconds
   - `trmnl.system.timestamp_utc` — current UTC timestamp
+  - `trmnl.plugin_settings.data_fetched_utc` — UTC timestamp of the fetch this screen shows
+  - `trmnl.plugin_settings.refresh_interval_minutes` — how often this plugin refreshes
+  - `trmnl.device.model`, `.bit_depth`, `.width`, `.height` — the screen this render is for
+  - `trmnl.device.sleep_start_time`, `.sleep_end_time` — minutes after local midnight, when `.sleep_mode_enabled`
 
 ---
 
