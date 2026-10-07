@@ -1,6 +1,6 @@
 # trmnl-agent-skills
 
-A template writing agent skill for the [TRMNL](https://trmnl.com), packaged for Claude Code, Cursor, opencode, OpenAI Codex CLI, Gemini CLI, and GitHub Copilot. Pair it with TRMNL's hosted MCP server for live operations on one plugin (API key) or your whole account (OAuth) — setup is in [`skills/trmnl/SKILL.md`](skills/trmnl/SKILL.md#adding-the-trmnl-mcp-server-optional).
+A template writing agent skill for the [TRMNL](https://trmnl.com), packaged for Claude Code, Cursor, opencode, OpenAI Codex CLI, Gemini CLI, and GitHub Copilot. Pair it with TRMNL's hosted MCP server for live operations on one plugin (API key) or your whole account (OAuth) — setup is in [`skills/trmnl/SKILL.md`](skills/trmnl/SKILL.md#adding-the-trmnl-mcp-server-optional), and the [MCP Server help article](https://help.trmnl.com/en/articles/17432548-mcp-server) walks through it for each client.
 
 The skill bundles three files copied verbatim from TRMNL's core repo, curated for the **external** agent context:
 
