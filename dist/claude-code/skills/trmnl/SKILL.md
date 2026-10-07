@@ -27,7 +27,7 @@ The skill works standalone — agents read the bundled references to write TRMNL
 | Connection | Credential | Tools you get |
 |---|---|---|
 | **One plugin** | MCP key from TRMNL dashboard → that plugin → settings → MCP tab, as `?api_key=` | The markup tools for that one plugin: read/write markup, screenshots, merge variables, logs, refresh, recipe search, design system reference |
-| **Whole account** | Sign in with OAuth (no key). The account API key from <https://trmnl.com/account> is for the REST API only and answers 401 on `/mcp` | The seven account tools: devices, playlists and mashups, plugin settings, markup, profile, recipes, third-party API search — every action is an operation of the REST API |
+| **Whole account** | Sign in with OAuth (no key). The account API key from <https://trmnl.com/account> is for the REST API only and answers 401 on `/mcp` | The account tools: devices, playlists and mashups, plugin settings, markup, profile, recipes, themes, authored plugins, apps and room booking, the plugin catalog, and third-party API search — every action is an operation of the REST API |
 
 The full authentication reference is <https://trmnl.com/auth.md>.
 
@@ -39,9 +39,9 @@ The full authentication reference is <https://trmnl.com/auth.md>.
 | Cursor | Edit `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` (per-project) and add: `{"mcpServers": {"trmnl": {"url": "https://trmnl.com/mcp?api_key=<api-key>", "type": "http"}}}` — restart Cursor afterward. | Same entry without `?api_key=`; Cursor prompts for the OAuth sign-in. |
 | Codex, Gemini, generic | Add to your MCP config JSON: `{"mcpServers": {"trmnl": {"url": "https://trmnl.com/mcp?api_key=<api-key>"}}}` | Same entry without `?api_key=`; the client must speak MCP OAuth (RFC 7591 registration, PKCE). |
 
-**Verify:** ask your agent to list TRMNL MCP tools. One plugin: `MarkupsReadTool`, `MarkupsWriteTool`, `MarkupsScreenshotTool`, etc. Whole account: `AccountDevicesTool`, `AccountPlaylistsTool`, `AccountPluginSettingsTool`, `AccountMarkupTool`, `AccountProfileTool`, `AccountRecipesTool`, `APIEndpointsSearchTool`.
+**Verify:** ask your agent to list TRMNL MCP tools. One plugin: `MarkupsReadTool`, `MarkupsWriteTool`, `MarkupsScreenshotTool`, etc. Whole account: `AccountDevicesReadTool`, `AccountDevicesWriteTool`, `AccountPlaylistsReadTool` and the rest of the account tools table below, plus `APIEndpointsSearchTool`.
 
-**Endpoint:** `POST https://trmnl.com/mcp`. Rate limit: 60 req / 60s. OAuth scopes are capabilities: `read` (list and read), `content` (markup, plugin data and fields, playlists, creating plugin settings), `devices` (device settings, identify), `delete` (plugin settings, playlist items), `profile` (`getMe`). Ask for all five; the user ticks what they want at consent (`delete` and `profile` start unticked) and may limit the connection to some devices and plugin settings. `write` is the older name for `content` + `devices` + `delete`.
+**Endpoint:** `POST https://trmnl.com/mcp`. Rate limit: 60 req / 60s. OAuth scopes are capabilities: `read` (list and read), `content` (markup, plugin data and fields, playlists, creating plugin settings), `devices` (device settings, identify), `delete` (plugin settings, playlist items), `profile` (`getMe`), `apps` (installing apps, fleets, room booking). Ask for all six; the user ticks what they want at consent (`delete`, `profile` and `apps` start unticked) and may limit the connection to some devices and plugin settings. `write` is the older name for `content` + `devices` + `delete`.
 
 ## Tool name mapping
 
@@ -65,16 +65,31 @@ If you're calling MCP from outside TRMNL's web app, use the right column. The re
 
 ### Account tools (whole-account connection)
 
-Each account tool takes an `action` (the REST API operation) and a `params` hash. The tool description lists every action with its parameters, accepted values and shapes — read it before guessing a shape.
+Each account tool takes an `action` (the REST API operation) and a `params` hash. The tool description lists every action with its parameters, accepted values and shapes — read it before guessing a shape. A `…ReadTool` holds only reads and is marked read-only, so clients run it without asking; every change is in the matching `…WriteTool`.
 
 | Tool | Actions |
 |---|---|
-| `AccountProfileTool` | `getMe`, `updateMe`, `listModels`, `listPalettes`, `listCategories` |
-| `AccountDevicesTool` | `listDevices`, `getDevice`, `updateDevice`, `identifyDevice`, `getDeviceLogs`, `clearDevicePlaylist` (destructive) |
-| `AccountPluginSettingsTool` | `listPluginSettings`, `createPluginSetting`, `getPluginSettingDetails`, `updatePluginSettingFields`, `getPluginSettingData` (native plugins), `updatePluginSettingData` (webhook plugins), `getPluginSettingLogs`, `getMergeVariables` (private plugins), `getPluginSettingFiles` / `importPluginSettingFiles` (private plugins), `uploadPluginSettingImage` (webhook_image plugins, base64), `deletePluginSetting` |
-| `AccountMarkupTool` | `readMarkup`, `writeMarkup`, `startPreview` / `getPreview`, `startRefresh` / `getRefresh` (start answers a `job_id`, poll with get) |
-| `AccountPlaylistsTool` | `listDevicePlaylist`, `addDevicePlaylistItem`, `reorderDevicePlaylist`, `copyDevicePlaylist`, `listPlaylistItems`, `updatePlaylistItem`, `deletePlaylistItem`, `getPlaylistItemSchedule`, `replacePlaylistItemSchedule`, `duplicatePlaylistItem`, `createDeviceMashup`, `getMashup`, `updateMashup` |
-| `AccountRecipesTool` | `searchRecipes`, `getRecipe`, `getRecipeMarkup`, `installRecipe` |
+| `AccountAppsReadTool` | `listApps`, `listAppInstallations`, `getFleet`, `listFleetDevices` |
+| `AccountAppsWriteTool` | `installApp`, `uninstallApp` (destructive), `addFleetDevice`, `removeFleetDevice`, `setFleetMaster`, `removeFleetMaster`, `updateFleetSettings`, `updateFleetAlerts`, `pushFleet`, `pushFleetDevice` |
+| `AccountAuthoringReadTool` | `listMyPlugins`, `getAuthorAnalytics`, `listAuthorPluginErrors`, `listUninstallFeedback` |
+| `AccountAuthoringWriteTool` | `createMyPlugin`, `updateMyPlugin`, `hideAuthorPluginError`, `unhideAuthorPluginError` |
+| `AccountDevicesReadTool` | `listDevices`, `getDevice`, `getDeviceLogs`, `getDeviceForecast`, `getDevicePlaylistCoverage`, `getDeviceTimeline` |
+| `AccountDevicesWriteTool` | `claimDevice`, `updateDevice`, `identifyDevice`, `clearDevicePlaylist` (destructive), `mirrorDevice`, `stopMirroringDevice`, `resyncDeviceMirror`, `retryDeviceFirmwareUpdate` |
+| `AccountMarkupReadTool` | `readMarkup`, `getPreview`, `getRefresh` |
+| `AccountMarkupWriteTool` | `writeMarkup`, `startPreview` (answers a `job_id`, poll with `getPreview`), `startRefresh` (answers a `job_id` on a polling instance, poll with `getRefresh`) |
+| `AccountPlaylistsReadTool` | `listDevicePlaylist`, `listPlaylistItems`, `getPlaylistItemSchedule`, `getMashup`, `getMashupTimeline` |
+| `AccountPlaylistsWriteTool` | `addDevicePlaylistItem`, `reorderDevicePlaylist`, `bulkUpdateDevicePlaylist`, `copyDevicePlaylist`, `updatePlaylistItem`, `deletePlaylistItem` (destructive), `replacePlaylistItemSchedule`, `duplicatePlaylistItem`, `createDeviceMashup`, `updateMashup`, `resetMashupHealth` |
+| `AccountPluginSettingsReadTool` | `listPluginSettings`, `getPluginSettingDetails`, `getPluginSettingData` (native plugins), `getPluginSettingLogs`, `getPluginSettingTimeline`, `getMergeVariables` (private plugins), `getPluginSettingFiles` (private plugins) |
+| `AccountPluginSettingsWriteTool` | `createPluginSetting`, `updatePluginSetting`, `deletePluginSetting` (destructive), `updatePluginSettingFields`, `updatePluginSettingData` (webhook plugins), `importPluginSettingFiles` (private plugins), `uploadPluginSettingImage` (webhook_image plugins, base64), `copyPluginSetting`, `clearPluginSettingState`, `enablePluginSettingDebugLogs`, `resetPluginSettingHealth`, `setPluginSettingFeaturedImage`, `removePluginSettingFeaturedImage`, `removePluginSettingTransform`, `verifyCustomFields`, `resetPluginSettingCredentials` (destructive) |
+| `AccountPluginsTool` | `listPlugins`, `getPlugin` |
+| `AccountProfileReadTool` | `getMe`, `listModels`, `listPalettes`, `listCategories` |
+| `AccountProfileWriteTool` | `updateMe` |
+| `AccountRecipesReadTool` | `searchRecipes`, `getRecipe`, `getRecipeMarkup` |
+| `AccountRecipesWriteTool` | `installRecipe` |
+| `AccountRoomBookingReadTool` | `getRoomBooking`, `getRoomBookingBilling`, `getRoomBookingSettings`, `listRoomBookingCalendars`, `getRoomBookingCalendar`, `listRoomBookingCalendarScreens`, `listRoomBookings`, `listRoomBookingCollections`, `listRoomBookingCollectionScreens`, `listRoomBookingIntegrations`, `getRoomBookingIntegrationConnectUrl` |
+| `AccountRoomBookingWriteTool` | `updateRoomBookingSettings`, `setRoomBookingCompanyLogo`, `removeRoomBookingCompanyLogo`, `setRoomBookingColorCompanyLogo`, `removeRoomBookingColorCompanyLogo`, `createRoomBookingCalendar`, `updateRoomBookingCalendar`, `deleteRoomBookingCalendar`, `refetchRoomBookingCalendar`, `bindRoomBookingCalendarDevice`, `unbindRoomBookingCalendarDevice`, `createRoomBooking`, `cancelRoomBooking`, `endRoomBooking`, `createRoomBookingCollection`, `updateRoomBookingCollection`, `deleteRoomBookingCollection`, `bindRoomBookingCollectionDevice`, `unbindRoomBookingCollectionDevice`, `syncRoomBookingIntegration`, `updateRoomBookingIntegration`, `disconnectRoomBookingIntegration` |
+| `AccountThemesReadTool` | `listUserThemes`, `getUserTheme` |
+| `AccountThemesWriteTool` | `createUserTheme`, `updateUserTheme`, `deleteUserTheme` (destructive), `importUserTheme` |
 | `APIEndpointsSearchTool` | search a catalog of free third-party APIs a private plugin can poll — not TRMNL's own API |
 
 Things that trip agents up:
