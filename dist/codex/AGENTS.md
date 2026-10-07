@@ -107,7 +107,7 @@ Things that trip agents up:
 | `agent_prompt.md:101` | `write_markup` "broadcasts live update to browser editor" | Web UI artifact. `MarkupsWriteTool` writes to the database; there's no editor to update. Ignore the broadcast wording. |
 | `agent_prompt.md:105-108` | Tools listed: `preview_markup`, `validate_liquid`, `version_history`, `ask_user` | None of these exist as external MCP tools. Skip workflow steps that depend on them. |
 
-Everything else in `agent_prompt.md` applies universally — design rules, e-ink constraints, image dithering, no-custom-styles, no-emojis, the data-first hard gate, spatial proportioning, layout system, charts.
+Everything else in `agent_prompt.md` applies universally — design rules, ePaper constraints, image dithering, no-custom-styles, no-emojis, the data-first hard gate, spatial proportioning, layout system, charts.
 
 `template_guide.md` and `framework_v3_guide.md` are pure design system reference — no in-app artifacts.
 

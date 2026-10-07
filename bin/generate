@@ -94,7 +94,7 @@ def emit_claude_code(skills)
     'homepage'    => REPO_URL,
     'repository'  => REPO_URL,
     'license'     => 'MIT',
-    'keywords'    => %w[trmnl e-ink display plugins agent-skills],
+    'keywords'    => %w[trmnl epaper e-ink display plugins agent-skills],
     'skills'      => './skills/',
     'mcpServers'  => { 'trmnl' => { 'type' => 'http', 'url' => MCP_SERVER_URL } }
   }
@@ -118,7 +118,7 @@ def emit_cursor(skills)
     'homepage'    => REPO_URL,
     'repository'  => REPO_URL,
     'license'     => 'MIT',
-    'keywords'    => %w[trmnl e-ink display plugins agent-skills],
+    'keywords'    => %w[trmnl epaper e-ink display plugins agent-skills],
     'skills'      => './skills/'
   }
   write_file(File.join(out, '.cursor-plugin', 'plugin.json'),
