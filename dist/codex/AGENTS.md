@@ -23,7 +23,7 @@ The skill works standalone — agents read the bundled references to write TRMNL
 | **One plugin** | MCP key from TRMNL dashboard → that plugin → settings → MCP tab, as `?api_key=` | The markup tools for that one plugin: read/write markup, screenshots, merge variables, logs, refresh, recipe search, design system reference |
 | **Whole account** | Sign in with OAuth (no key). The account API key from <https://trmnl.com/account> is for the REST API only and answers 401 on `/mcp` | The account tools: devices, playlists and mashups, plugin settings, markup, profile, recipes, themes, authored plugins, apps and room booking, the plugin catalog, and third-party API search — every action is an operation of the REST API |
 
-The full authentication reference is <https://trmnl.com/auth.md>.
+The full authentication reference is <https://trmnl.com/auth.md>. Step-by-step setup for Claude, ChatGPT, Cursor and other clients: <https://help.trmnl.com/en/articles/17432548-mcp-server>.
 
 ### Register the server with your agent
 
