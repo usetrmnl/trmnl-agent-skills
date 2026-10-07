@@ -2,11 +2,11 @@
 applyTo: "**"
 description: Use when working on anything TRMNL — building plugins, writing or editing
   markup, designing layouts using the TRMNL CSS framework, calling the TRMNL MCP server
-  (mcp__trmnl__*), or any task that mentions "trmnl", "e-ink display", "trmnl.com",
-  "TRMNL plugin", "Liquid markup", "image-dither", "title_bar", or screen sizes 800x480
-  / 800x240 / 400x480 / 400x240. References embed the production prompts TRMNL's external
-  MCP server ships — agent rules, the full design system template guide, and the framework
-  v3 supplement.
+  (mcp__trmnl__*), or any task that mentions "trmnl", "ePaper display", "e-ink display",
+  "trmnl.com", "TRMNL plugin", "Liquid markup", "image-dither", "title_bar", or screen
+  sizes 800x480 / 800x240 / 400x480 / 400x240. References embed the production prompts
+  TRMNL's external MCP server ships — agent rules, the full design system template
+  guide, and the framework v3 supplement.
 ---
 
 # TRMNL
@@ -114,7 +114,7 @@ Things that trip agents up:
 | `agent_prompt.md:101` | `write_markup` "broadcasts live update to browser editor" | Web UI artifact. `MarkupsWriteTool` writes to the database; there's no editor to update. Ignore the broadcast wording. |
 | `agent_prompt.md:105-108` | Tools listed: `preview_markup`, `validate_liquid`, `version_history`, `ask_user` | None of these exist as external MCP tools. Skip workflow steps that depend on them. |
 
-Everything else in `agent_prompt.md` applies universally — design rules, e-ink constraints, image dithering, no-custom-styles, no-emojis, the data-first hard gate, spatial proportioning, layout system, charts.
+Everything else in `agent_prompt.md` applies universally — design rules, ePaper constraints, image dithering, no-custom-styles, no-emojis, the data-first hard gate, spatial proportioning, layout system, charts.
 
 `template_guide.md` and `framework_v3_guide.md` are pure design system reference — no in-app artifacts.
 
