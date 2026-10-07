@@ -19,7 +19,8 @@ ROOT       = File.expand_path('..', __dir__)
 SOURCE_DIR = File.join(ROOT, 'skills')
 DIST_DIR   = ENV.fetch('TRMNL_DIST_DIR', File.join(ROOT, 'dist'))
 REPO_URL   = 'https://github.com/usetrmnl/trmnl-agent-skills'
-PLUGIN_VER = '0.2.0'
+PLUGIN_VER = '0.3.0'
+MCP_SERVER_URL = 'https://trmnl.com/mcp'
 
 # --- skill parsing -----------------------------------------------------------
 
@@ -89,11 +90,13 @@ def emit_claude_code(skills)
     'name'        => 'trmnl',
     'version'     => PLUGIN_VER,
     'description' => 'TRMNL agent skill — verbatim mirror of core AI assistant prompts',
+    'author'      => { 'name' => 'TRMNL' },
     'homepage'    => REPO_URL,
     'repository'  => REPO_URL,
     'license'     => 'MIT',
     'keywords'    => %w[trmnl e-ink display plugins agent-skills],
-    'skills'      => './skills/'
+    'skills'      => './skills/',
+    'mcpServers'  => { 'trmnl' => { 'type' => 'http', 'url' => MCP_SERVER_URL } }
   }
   write_file(File.join(out, '.claude-plugin', 'plugin.json'),
              JSON.pretty_generate(manifest) + "\n")
@@ -120,6 +123,8 @@ def emit_cursor(skills)
   }
   write_file(File.join(out, '.cursor-plugin', 'plugin.json'),
              JSON.pretty_generate(manifest) + "\n")
+  write_file(File.join(out, 'mcp.json'),
+             JSON.pretty_generate('mcpServers' => { 'trmnl' => { 'url' => MCP_SERVER_URL } }) + "\n")
 
   FileUtils.mkdir_p(File.join(out, 'skills'))
   skills.each { |s| FileUtils.cp_r(s[:dir], File.join(out, 'skills')) }
