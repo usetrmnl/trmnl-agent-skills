@@ -456,7 +456,7 @@ grid defaults to 12 columns. use `col--span-{N}` where spans add up to the colum
 <span class="value value--tnums" data-value-type="number">$159,022</span>
 ```
 
-sizes (small → huge): `value--xxsmall`, `value--xsmall`, `value--small`, `value--base`, `value--medium`, `value--large`, `value--xlarge`, `value--xxlarge`, `value--xxxlarge`, `value--mega`, `value--giga`, `value--tera`, `value--peta`
+sizes (small → huge): `value--xxsmall`, `value--xsmall`, `value--small`, `value--base`, `value--large`, `value--xlarge`, `value--xxlarge`, `value--xxxlarge`, `value--mega`, `value--giga`, `value--tera`, `value--peta`
 
 key attributes:
 - `data-fit-value="true"` — auto-shrinks font to fit container
@@ -469,7 +469,7 @@ key attributes:
 <span class="title title--small">Section Header</span>
 <span class="title title--small lg:title--base">Responsive Title</span>
 ```
-sizes: `title--xsmall`, `title--small`, `title--base`, `title--medium`, `title--large`, `title--xlarge`, `title--xxlarge`
+sizes: `title--small`, `title--base`, `title--large`, `title--xlarge`, `title--xxlarge`
 
 ### label — for captions, metadata, secondary text
 ```html
@@ -480,7 +480,7 @@ sizes: `title--xsmall`, `title--small`, `title--base`, `title--medium`, `title--
 <span class="label label--underline">Underlined</span>
 <span class="label label--outline">Outlined badge</span>
 ```
-sizes: `label--xsmall`, `label--small`, `label--base`, `label--medium`, `label--large`, `label--xlarge`, `label--xxlarge`
+sizes: `label--small`, `label--base`, `label--large`, `label--xlarge`, `label--xxlarge`
 
 gray variants: `label--gray` (default muted) and `label--gray-N` for specific shades. additional color variants (e.g. `label--primary`, `label--success`) depend on the framework version — see the framework supplement.
 
@@ -489,9 +489,9 @@ gray variants: `label--gray` (default muted) and `label--gray-N` for specific sh
 ### description — for body text and paragraphs
 ```html
 <span class="description">Longer explanation text here</span>
-<span class="description description--small">Fine print</span>
+<span class="description description--large">Lead paragraph</span>
 ```
-sizes: `description--xsmall`, `description--small`, `description--base`, `description--medium`, `description--large`, `description--xlarge`, `description--xxlarge`
+sizes: `description--base`, `description--large`, `description--xlarge`, `description--xxlarge`
 
 ---
 
@@ -764,7 +764,7 @@ auto-distributes items into columns when they exceed available height.
 </div>
 
 <!-- Group headers -->
-<span class="label label--medium group-header" data-group-header="true">Today</span>
+<span class="label group-header" data-group-header="true">Today</span>
 ```
 
 | Attribute | Default | Description |
@@ -2022,7 +2022,7 @@ best for: events, tasks, feeds, notifications, any list of similar items.
 <div class="layout">
   <div class="columns">
     <div class="column">
-      <span class="label label--medium group-header" data-group-header="true">{{ date_label }}</span>
+      <span class="label group-header" data-group-header="true">{{ date_label }}</span>
       {% for event in events %}
       <div class="item">
         <div class="meta">
@@ -2311,14 +2311,14 @@ uses Highcharts pie with TRMNL pattern-fill PNGs for 1-bit compatibility, paired
           <div class="meta"></div>
           <div class="content">
             <span class="value value--small value--tnums" data-value-format="true">{{ worldPopulation }}</span>
-            <span class="label label--xsmall">World Pop</span>
+            <span class="label label--small">World Pop</span>
           </div>
         </div>
         <div class="item">
           <div class="meta"></div>
           <div class="content">
             <span class="value value--small value--tnums">{{ totalCountries }}</span>
-            <span class="label label--xsmall">Countries</span>
+            <span class="label label--small">Countries</span>
           </div>
         </div>
       </div>
@@ -2709,7 +2709,7 @@ every field must have: `keyname`, `field_type`, `name`
   learn_more_url: https://trmnl.com
 ```
 
-the author bio `description` is the public recipe page text and link preview. a published recipe needs at least 100 words there to appear in search engines.
+the author bio `description` is the public recipe page text and link preview. a published recipe needs at least 42 words there to appear in search engines.
 
 **authenticated dropdown (xhrSelect via server-side `remote:`):**
 
