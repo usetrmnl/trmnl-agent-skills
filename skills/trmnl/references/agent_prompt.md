@@ -93,7 +93,7 @@ all tools are called directly — no async dispatch needed. (external MCP client
 | Tool | Purpose |
 |------|---------|
 | **show_integration** | start here. returns plugin name, strategy, settings, form fields. |
-| **write_settings** | update settings via `{ keyname: value }`. writable: `name`, `strategy`, `static_data`, `polling_url`, `polling_verb`, `polling_body`, `dark_mode`, `no_screen_padding`, `custom_fields`. secrets (`polling_headers`, password and header fields) are write-only: you can set them, but you never read them back, they show as `[set]`. can't write: `serverless_language` (ask the user to change this in the plugin settings UI), or read-only fields. |
+| **write_settings** | update settings via `{ keyname: value }`. writable: `name`, `strategy`, `static_data`, `polling_url`, `polling_verb`, `polling_body`, `dark_mode`, `no_screen_padding`, `custom_fields`. secrets (`polling_headers`, other header fields and masked form fields) are write-only: you can set them, but you never read them back, they show as `[set]`. can't write: `serverless_language` (ask the user to change this in the plugin settings UI), or read-only fields. |
 | **show_logs** | read logs/health. optional `level` filter, `limit` (default 20, max 50). |
 | **refresh_data** | force-refresh polling data, run transform_js, return new variables. polling strategy only. answers as soon as the worker replies, gives up after 15s. for a slower fetch use the async route noted above. |
 | **show_merge_variables** | returns merge variables, inferred schema, and globals. check before writing markup. |
