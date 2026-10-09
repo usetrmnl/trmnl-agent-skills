@@ -121,20 +121,25 @@ def emit_cursor(skills)
 
   manifest = {
     'name'        => 'trmnl',
+    'displayName' => 'TRMNL',
     'version'     => PLUGIN_VER,
     'description' => PLUGIN_DESCRIPTION,
     'author'      => { 'name' => 'TRMNL' },
-    'homepage'    => REPO_URL,
+    'homepage'    => 'https://trmnl.com',
     'repository'  => REPO_URL,
     'license'     => 'MIT',
     'keywords'    => %w[trmnl epaper e-ink display plugins agent-skills],
-    'skills'      => './skills/'
+    'skills'      => './skills/',
+    'logo'        => 'assets/logo.svg'
   }
   write_file(File.join(out, '.cursor-plugin', 'plugin.json'),
              JSON.pretty_generate(manifest) + "\n")
   write_file(File.join(out, 'mcp.json'),
              JSON.pretty_generate('mcpServers' => { 'trmnl' => { 'url' => MCP_SERVER_URL } }) + "\n")
 
+  FileUtils.mkdir_p(File.join(out, 'assets'))
+  FileUtils.cp(File.join(ROOT, 'templates', 'cursor', 'logo.svg'), File.join(out, 'assets', 'logo.svg'))
+  FileUtils.cp(File.join(ROOT, 'templates', 'cursor', 'README.md'), File.join(out, 'README.md'))
   FileUtils.mkdir_p(File.join(out, 'skills'))
   skills.each { |s| FileUtils.cp_r(s[:dir], File.join(out, 'skills')) }
 end
