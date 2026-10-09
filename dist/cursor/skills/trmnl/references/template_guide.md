@@ -581,7 +581,7 @@ the `item` is the fundamental content unit. it pairs a value/title with a label/
 </table>
 ```
 
-sizes: `table--small`, `table--base`, `table--large`, `table--xsmall`
+sizes: `table--xsmall`, `table--small`, `table--base`, `table--large`, `table--xlarge`
 `data-table-limit="true"` enables the Table Overflow engine (auto-hides rows that don't fit).
 
 ---
@@ -687,7 +687,6 @@ integrations: `data-content-limiter="true"` (auto-resize), `data-pixel-perfect="
 <span class="text--gray-30">      <!-- gray shade; framework renders via pattern on 1-bit/2-bit, solid color on 4-bit -->
 <span class="text--gray-60">      <!-- lighter gray shade -->
 <span class="text--bold">         <!-- bold -->
-<span class="text--uppercase">    <!-- uppercase -->
 ```
 
 **gray text on 1-bit** uses a pattern PNG clipped to the text shape (not a CSS color). the framework handles this automatically — always use `text--gray-N` or `label--gray` classes, never `color: #555` in raw CSS. the exact gray-N scale available depends on framework version — see the supplement.
