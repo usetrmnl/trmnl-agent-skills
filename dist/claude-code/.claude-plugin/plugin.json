@@ -6,10 +6,13 @@
   "author": {
     "name": "TRMNL"
   },
-  "homepage": "https://github.com/usetrmnl/trmnl-agent-skills",
+  "homepage": "https://trmnl.com",
   "repository": "https://github.com/usetrmnl/trmnl-agent-skills",
   "license": "MIT",
   "privacyPolicyUrl": "https://trmnl.com/privacy",
+  "termsOfServiceUrl": "https://trmnl.com/terms",
+  "documentationUrl": "https://help.trmnl.com/en/articles/17432548-mcp-server",
+  "supportUrl": "https://help.trmnl.com",
   "icon": "./.claude-plugin/trmnl-icon.png",
   "keywords": [
     "trmnl",
