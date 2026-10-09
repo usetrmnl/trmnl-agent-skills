@@ -10,6 +10,7 @@
   "repository": "https://github.com/usetrmnl/trmnl-agent-skills",
   "license": "MIT",
   "privacyPolicyUrl": "https://trmnl.com/privacy",
+  "icon": "./.claude-plugin/trmnl-icon.png",
   "keywords": [
     "trmnl",
     "epaper",

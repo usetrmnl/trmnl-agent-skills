@@ -97,6 +97,7 @@ def emit_claude_code(skills)
     'repository'  => REPO_URL,
     'license'     => 'MIT',
     'privacyPolicyUrl' => 'https://trmnl.com/privacy',
+    'icon'        => './.claude-plugin/trmnl-icon.png',
     'keywords'    => %w[trmnl epaper e-ink display plugins agent-skills],
     'skills'      => './skills/',
     'mcpServers'  => { 'trmnl' => { 'type' => 'http', 'url' => MCP_SERVER_URL } }
@@ -104,7 +105,7 @@ def emit_claude_code(skills)
   write_file(File.join(out, '.claude-plugin', 'plugin.json'),
              JSON.pretty_generate(manifest) + "\n")
   FileUtils.cp(File.join(ROOT, 'templates', 'claude-code', 'README.md'), File.join(out, 'README.md'))
-  FileUtils.cp(File.join(ROOT, 'templates', 'claude-code', 'icon.png'), File.join(out, '.claude-plugin', 'icon.png'))
+  FileUtils.cp(File.join(ROOT, 'templates', 'claude-code', 'icon.png'), File.join(out, '.claude-plugin', 'trmnl-icon.png'))
 
   FileUtils.mkdir_p(File.join(out, 'skills'))
   skills.each { |s| FileUtils.cp_r(s[:dir], File.join(out, 'skills')) }
