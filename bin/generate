@@ -19,7 +19,8 @@ ROOT       = File.expand_path('..', __dir__)
 SOURCE_DIR = File.join(ROOT, 'skills')
 DIST_DIR   = ENV.fetch('TRMNL_DIST_DIR', File.join(ROOT, 'dist'))
 REPO_URL   = 'https://github.com/usetrmnl/trmnl-agent-skills'
-PLUGIN_VER = '0.3.1'
+PLUGIN_VER = '0.4.0'
+PLUGIN_DESCRIPTION = 'Design TRMNL ePaper screens with the full TRMNL design system, and run your displays through the TRMNL MCP server.'
 MCP_SERVER_URL = 'https://trmnl.com/mcp'
 
 # --- skill parsing -----------------------------------------------------------
@@ -88,8 +89,9 @@ def emit_claude_code(skills)
 
   manifest = {
     'name'        => 'trmnl',
+    'displayName' => 'TRMNL',
     'version'     => PLUGIN_VER,
-    'description' => 'TRMNL agent skill — verbatim mirror of core AI assistant prompts',
+    'description' => PLUGIN_DESCRIPTION,
     'author'      => { 'name' => 'TRMNL' },
     'homepage'    => REPO_URL,
     'repository'  => REPO_URL,
@@ -100,6 +102,7 @@ def emit_claude_code(skills)
   }
   write_file(File.join(out, '.claude-plugin', 'plugin.json'),
              JSON.pretty_generate(manifest) + "\n")
+  FileUtils.cp(File.join(ROOT, 'templates', 'claude-code', 'README.md'), File.join(out, 'README.md'))
 
   FileUtils.mkdir_p(File.join(out, 'skills'))
   skills.each { |s| FileUtils.cp_r(s[:dir], File.join(out, 'skills')) }
@@ -113,7 +116,7 @@ def emit_cursor(skills)
   manifest = {
     'name'        => 'trmnl',
     'version'     => PLUGIN_VER,
-    'description' => 'TRMNL agent skill — verbatim mirror of core AI assistant prompts',
+    'description' => PLUGIN_DESCRIPTION,
     'author'      => { 'name' => 'TRMNL' },
     'homepage'    => REPO_URL,
     'repository'  => REPO_URL,
