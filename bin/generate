@@ -184,6 +184,18 @@ def emit_gemini(skills)
   skills.each { |s| copy_skill_subdirs(s, File.join(out, 'refs'), File.join(out, 'assets')) }
 end
 
+# The Gemini CLI extensions gallery reads gemini-extension.json from the repository root only.
+def emit_gemini_extension
+  manifest = {
+    'name'            => 'trmnl',
+    'version'         => PLUGIN_VER,
+    'description'     => PLUGIN_DESCRIPTION,
+    'mcpServers'      => { 'trmnl' => { 'httpUrl' => MCP_SERVER_URL } },
+    'contextFileName' => 'dist/gemini/GEMINI.md'
+  }
+  write_file(File.join(ROOT, 'gemini-extension.json'), JSON.pretty_generate(manifest) + "\n")
+end
+
 def gemini_imports_section(skills)
   refs = skills.flat_map do |skill|
     refs_dir = File.join(skill[:dir], 'references')
@@ -245,6 +257,7 @@ def main
   emit_cursor(skills)
   emit_codex(skills)
   emit_gemini(skills)
+  emit_gemini_extension
   emit_copilot(skills)
 
   puts "Generated #{skills.size} skill(s) into #{DIST_DIR}"

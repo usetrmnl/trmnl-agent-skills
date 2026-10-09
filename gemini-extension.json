@@ -1,0 +1,11 @@
+{
+  "name": "trmnl",
+  "version": "0.4.0",
+  "description": "Design TRMNL ePaper screens with the full TRMNL design system, and run your displays through the TRMNL MCP server.",
+  "mcpServers": {
+    "trmnl": {
+      "httpUrl": "https://trmnl.com/mcp"
+    }
+  },
+  "contextFileName": "dist/gemini/GEMINI.md"
+}
