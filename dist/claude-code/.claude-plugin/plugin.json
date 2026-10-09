@@ -1,16 +1,32 @@
 {
   "name": "trmnl",
-  "version": "0.2.0",
-  "description": "TRMNL agent skill — verbatim mirror of core AI assistant prompts",
-  "homepage": "https://github.com/usetrmnl/trmnl-agent-skills",
+  "displayName": "TRMNL",
+  "version": "0.4.0",
+  "description": "Design TRMNL ePaper screens with the full TRMNL design system, and run your displays through the TRMNL MCP server.",
+  "author": {
+    "name": "TRMNL"
+  },
+  "homepage": "https://trmnl.com",
   "repository": "https://github.com/usetrmnl/trmnl-agent-skills",
   "license": "MIT",
+  "privacyPolicyUrl": "https://trmnl.com/privacy",
+  "termsOfServiceUrl": "https://trmnl.com/terms",
+  "documentationUrl": "https://help.trmnl.com/en/articles/17432548-mcp-server",
+  "supportUrl": "https://help.trmnl.com",
+  "icon": "./.claude-plugin/trmnl-icon.png",
   "keywords": [
     "trmnl",
+    "epaper",
     "e-ink",
     "display",
     "plugins",
     "agent-skills"
   ],
-  "skills": "./skills/"
+  "skills": "./skills/",
+  "mcpServers": {
+    "trmnl": {
+      "type": "http",
+      "url": "https://trmnl.com/mcp"
+    }
+  }
 }

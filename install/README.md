@@ -1,6 +1,6 @@
 # Installing trmnl-agent-skills
 
-One skill (`trmnl`), seven harness install paths across six generated outputs — opencode shares Claude Code's, since both read the Anthropic Agent Skills format, and Hermes uses the same native `SKILL.md` layout. `dist/` is committed — every harness ships with bundled reference files, no Ruby needed.
+One skill (`trmnl`), seven harness install paths across five generated outputs — opencode shares Claude Code's, since both read the Anthropic Agent Skills format, and Hermes reads `skills/trmnl` directly. `dist/` is committed — every harness ships with bundled reference files, no Ruby needed.
 
 Most installs are `git clone` then `cp -r` to copy both the main file AND its sibling `refs/` directory. The `refs/` directory contains the verbatim copies of `agent_prompt.md`, `template_guide.md`, and `framework_v3_guide.md` (~3300 lines total). Without it, your agent can't read the design system on demand.
 
@@ -129,18 +129,18 @@ This copies `.github/copilot-instructions.md`, `.github/instructions/trmnl.instr
 
 ## Hermes Agent
 
-Hermes loads native skills from `$HERMES_HOME/skills` (`~/.hermes/skills` by default). Copy the generated skill directory, preserving its `references/` directory:
+Hermes loads native skills from `$HERMES_HOME/skills` (`~/.hermes/skills` by default). Hermes reads the same `SKILL.md` and `references/` layout as the source skill, so copy `skills/trmnl` as it is:
 
 ```bash
 git clone --depth 1 https://github.com/usetrmnl/trmnl-agent-skills /tmp/trmnl
 mkdir -p "${HERMES_HOME:-$HOME/.hermes}/skills"
-cp -r /tmp/trmnl/dist/hermes/skills/trmnl "${HERMES_HOME:-$HOME/.hermes}/skills/"
+cp -r /tmp/trmnl/skills/trmnl "${HERMES_HOME:-$HOME/.hermes}/skills/"
 ```
 
 For local development, symlink it instead:
 
 ```bash
-ln -sfn "$PWD/dist/hermes/skills/trmnl" \
+ln -sfn "$PWD/skills/trmnl" \
   "${HERMES_HOME:-$HOME/.hermes}/skills/trmnl"
 ```
 

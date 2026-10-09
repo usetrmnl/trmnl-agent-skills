@@ -6,7 +6,7 @@ Keep in sync via: bin/sync-from-core
 
 # TRMNL Liquid Template Builder
 
-you're a TRMNL plugin template designer. you create Liquid templates that render beautifully on e-ink displays using the TRMNL design system framework. you know the framework deeply, use it by default, but you're not limited by it when creative expression demands more.
+you're a TRMNL plugin template designer. you create Liquid templates that render beautifully on ePaper displays using the TRMNL design system framework. you know the framework deeply, use it by default, but you're not limited by it when creative expression demands more.
 
 > **version note:** a framework-version supplement is appended after this guide
 > with version-specific details (available colors, grayscale scale, migration
@@ -16,8 +16,8 @@ you're a TRMNL plugin template designer. you create Liquid templates that render
 
 ## 1. WHAT IS TRMNL
 
-TRMNL is an e-ink display platform. users install plugins that fetch data from APIs and render it as screens. here's what you're working with:
-- **e-ink rendering**: 1-bit (black/white), 2-bit (4 shades), or 4-bit (16 shades of gray). some newer devices also support chromatic color panels — see the framework supplement for which colors the current version exposes.
+TRMNL is an ePaper display platform. users install plugins that fetch data from APIs and render it as screens. here's what you're working with:
+- **ePaper rendering**: 1-bit (black/white), 2-bit (4 shades), or 4-bit (16 shades of gray). some newer devices also support chromatic color panels — see the framework supplement for which colors the current version exposes.
 - **landscape default**: 800x480px (OG), 1040x780px (V2/X).
 - **portrait supported**: dimensions swap.
 - **refreshes periodically**: not real-time. content is a snapshot.
@@ -248,6 +248,10 @@ in your Liquid templates, data is available as top-level variables:
   - `trmnl.user.time_zone_iana` — user's timezone
   - `trmnl.user.utc_offset` — UTC offset in seconds
   - `trmnl.system.timestamp_utc` — current UTC timestamp
+  - `trmnl.plugin_settings.data_fetched_utc` — UTC timestamp of the fetch this screen shows
+  - `trmnl.plugin_settings.refresh_interval_minutes` — how often this plugin refreshes
+  - `trmnl.device.model`, `.bit_depth`, `.width`, `.height` — the screen this render is for
+  - `trmnl.device.sleep_start_time`, `.sleep_end_time` — minutes after local midnight, when `.sleep_mode_enabled`
 
 ---
 
@@ -319,7 +323,7 @@ the default title_bar uses a generic icon. to customize with a plugin-specific i
 
 **rules:**
 - SVG icons should be 24×24px for the title_bar.
-- use `image-stroke` class on title_bar SVG icons for consistent e-ink styling.
+- use `image-stroke` class on title_bar SVG icons for consistent ePaper styling.
 - define the capture in `shared.liquid` / `markup_shared` so the icon is defined once and reused across all sizes.
 - inline images eliminate network requests — more reliable on the device.
 - never use a URL-based icon when inline SVG is possible.
@@ -452,7 +456,7 @@ grid defaults to 12 columns. use `col--span-{N}` where spans add up to the colum
 <span class="value value--tnums" data-value-type="number">$159,022</span>
 ```
 
-sizes (small → huge): `value--xxsmall`, `value--xsmall`, `value--small`, `value--base`, `value--medium`, `value--large`, `value--xlarge`, `value--xxlarge`, `value--xxxlarge`, `value--mega`, `value--giga`, `value--tera`, `value--peta`
+sizes (small → huge): `value--xxsmall`, `value--xsmall`, `value--small`, `value--base`, `value--large`, `value--xlarge`, `value--xxlarge`, `value--xxxlarge`, `value--mega`, `value--giga`, `value--tera`, `value--peta`
 
 key attributes:
 - `data-fit-value="true"` — auto-shrinks font to fit container
@@ -465,7 +469,7 @@ key attributes:
 <span class="title title--small">Section Header</span>
 <span class="title title--small lg:title--base">Responsive Title</span>
 ```
-sizes: `title--xsmall`, `title--small`, `title--base`, `title--medium`, `title--large`, `title--xlarge`, `title--xxlarge`
+sizes: `title--small`, `title--base`, `title--large`, `title--xlarge`, `title--xxlarge`
 
 ### label — for captions, metadata, secondary text
 ```html
@@ -476,7 +480,7 @@ sizes: `title--xsmall`, `title--small`, `title--base`, `title--medium`, `title--
 <span class="label label--underline">Underlined</span>
 <span class="label label--outline">Outlined badge</span>
 ```
-sizes: `label--xsmall`, `label--small`, `label--base`, `label--medium`, `label--large`, `label--xlarge`, `label--xxlarge`
+sizes: `label--small`, `label--base`, `label--large`, `label--xlarge`, `label--xxlarge`
 
 gray variants: `label--gray` (default muted) and `label--gray-N` for specific shades. additional color variants (e.g. `label--primary`, `label--success`) depend on the framework version — see the framework supplement.
 
@@ -485,9 +489,9 @@ gray variants: `label--gray` (default muted) and `label--gray-N` for specific sh
 ### description — for body text and paragraphs
 ```html
 <span class="description">Longer explanation text here</span>
-<span class="description description--small">Fine print</span>
+<span class="description description--large">Lead paragraph</span>
 ```
-sizes: `description--xsmall`, `description--small`, `description--base`, `description--medium`, `description--large`, `description--xlarge`, `description--xxlarge`
+sizes: `description--base`, `description--large`, `description--xlarge`, `description--xxlarge`
 
 ---
 
@@ -577,7 +581,7 @@ the `item` is the fundamental content unit. it pairs a value/title with a label/
 </table>
 ```
 
-sizes: `table--small`, `table--base`, `table--large`, `table--xsmall`
+sizes: `table--xsmall`, `table--small`, `table--base`, `table--large`, `table--xlarge`
 `data-table-limit="true"` enables the Table Overflow engine (auto-hides rows that don't fit).
 
 ---
@@ -636,7 +640,7 @@ sizes: `progress-dots`, `progress-dots--xsmall`, `progress-dots--small`, `progre
 ```
 alignment — container: `richtext--left`, `richtext--center`, `richtext--right`; content: `content--left`, `content--center`, `content--right`
 content sizes: `content--small`, `content--base`, `content--large`, `content--xlarge`, `content--xxlarge`, `content--xxxlarge`
-integrations: `data-content-limiter="true"` (auto-resize), `data-pixel-perfect="true"` (crisp e-ink rendering)
+integrations: `data-content-limiter="true"` (auto-resize), `data-pixel-perfect="true"` (crisp ePaper rendering)
 
 ---
 
@@ -683,7 +687,6 @@ integrations: `data-content-limiter="true"` (auto-resize), `data-pixel-perfect="
 <span class="text--gray-30">      <!-- gray shade; framework renders via pattern on 1-bit/2-bit, solid color on 4-bit -->
 <span class="text--gray-60">      <!-- lighter gray shade -->
 <span class="text--bold">         <!-- bold -->
-<span class="text--uppercase">    <!-- uppercase -->
 ```
 
 **gray text on 1-bit** uses a pattern PNG clipped to the text shape (not a CSS color). the framework handles this automatically — always use `text--gray-N` or `label--gray` classes, never `color: #555` in raw CSS. the exact gray-N scale available depends on framework version — see the supplement.
@@ -746,7 +749,7 @@ these are JavaScript engines that run at render time to optimize layout.
 ### overflow engine
 auto-distributes items into columns when they exceed available height.
 
-> **recommendation:** prefer `data-clamp` for text truncation instead of `data-overflow="true"`. the overflow engine adds complexity and can produce unpredictable layouts on e-ink. use `data-clamp` on titles, descriptions, and labels to control content length.
+> **recommendation:** prefer `data-clamp` for text truncation instead of `data-overflow="true"`. the overflow engine adds complexity and can produce unpredictable layouts on ePaper. use `data-clamp` on titles, descriptions, and labels to control content length.
 
 ```html
 <!-- Preferred: use data-clamp for text truncation -->
@@ -760,7 +763,7 @@ auto-distributes items into columns when they exceed available height.
 </div>
 
 <!-- Group headers -->
-<span class="label label--medium group-header" data-group-header="true">Today</span>
+<span class="label group-header" data-group-header="true">Today</span>
 ```
 
 | Attribute | Default | Description |
@@ -1014,7 +1017,7 @@ new Chartkick.LineChart("chart-id", data, {
   max: 100,             // maximum y value
 
   // Appearance
-  colors: ["#000"],                  // line/bar colors (e-ink: use black + grays)
+  colors: ["#000"],                  // line/bar colors (ePaper: use black + grays)
   curve: false,                      // straight lines (true = smooth curves)
   points: false,                     // hide data point markers
   stacked: true,                     // stack bars/columns/areas
@@ -1061,7 +1064,7 @@ new Chartkick.LineChart("chart-id", data, {
   legend: false,
   library: {
     chart: {
-      backgroundColor: "transparent",    // ALWAYS for e-ink
+      backgroundColor: "transparent",    // ALWAYS for ePaper
       spacing: [5, 5, 5, 5]             // reduce chart padding
     },
     xAxis: {
@@ -1108,7 +1111,7 @@ new Chartkick.LineChart("chart-id", data, {
     legend: { enabled: false },
     title: { text: null },               // no chart title (use framework title_bar)
     credits: { enabled: false },         // remove "Highcharts.com" watermark
-    tooltip: { enabled: false }          // disable tooltips (no hover on e-ink)
+    tooltip: { enabled: false }          // disable tooltips (no hover on ePaper)
   }
 });
 ```
@@ -1153,14 +1156,14 @@ for chart types Chartkick doesn't support (gauges, radar, heatmap), use the High
 </script>
 ```
 
-### e-ink chart design rules
+### ePaper chart design rules
 
 1. **always `backgroundColor: "transparent"`** — the framework handles the background.
 2. **black lines on 4-bit, pattern fills on 1-bit** — `colors: ["#000"]` for lines. for fills (area, column, pie), use pattern-fill module with TRMNL's grayscale PNGs on 1-bit, or `#ddd`/`#ccc` on 4-bit.
-3. **no tooltips** — `tooltip: { enabled: false }`. e-ink has no hover/cursor.
+3. **no tooltips** — `tooltip: { enabled: false }`. ePaper has no hover/cursor.
 4. **no credits** — `credits: { enabled: false }`. remove the Highcharts watermark.
 5. **no chart title** — `title: { text: null }`. use the framework's `<div class="title_bar">` instead.
-6. **minimal axes** — hide or simplify. e-ink's low resolution makes small axis text hard to read.
+6. **minimal axes** — hide or simplify. ePaper's low resolution makes small axis text hard to read.
 7. **no animations** — `animation: false`. screenshots capture a single frame; animations cause partially-rendered charts.
 8. **container sizing** — use `style="width: 100%; flex-grow: 1;"` to fill remaining layout space.
 9. **distinguish series with patterns** — on 1-bit, multiple series in the same chart look identical if both are solid black. use pattern-fill module: one series solid black, others with different gray-N patterns.
@@ -1169,19 +1172,19 @@ for chart types Chartkick doesn't support (gauges, radar, heatmap), use the High
     - `half_vertical` — narrower chart, reduce axis labels
     - `quadrant` — usually too small for charts; show values/items instead
 
-### e-ink chart settings quick reference
+### ePaper chart settings quick reference
 
 | Setting | Value | Reason |
 |---------|-------|--------|
 | `animation` | `false` | prevents partial capture during screenshot |
-| `enableMouseTracking` | `false` | no mouse on e-ink |
+| `enableMouseTracking` | `false` | no mouse on ePaper |
 | `tooltip.enabled` | `false` | no hover capability |
 | `legend.enabled` | `false` | use framework labels instead |
 | `credits.enabled` | `false` | remove Highcharts watermark |
-| `gridLineDashStyle` | `"shortdot"` / `"dot"` | clean rendering on e-ink |
+| `gridLineDashStyle` | `"shortdot"` / `"dot"` | clean rendering on ePaper |
 | `gridLineColor` | `"#000000"` | visible on 1-bit displays |
-| Label `fontSize` | `"16px"` | readable at e-ink resolution |
-| Line `lineWidth` | `4-5` | visible on e-ink (thin lines disappear) |
+| Label `fontSize` | `"16px"` | readable at ePaper resolution |
+| Line `lineWidth` | `4-5` | visible on ePaper (thin lines disappear) |
 
 ### chartkick load event pattern
 
@@ -1196,7 +1199,7 @@ else { window.addEventListener("chartkick:load", createChart, true); }
 
 ### Highcharts native API deep reference
 
-when Chartkick's options aren't enough, use the `library` pass-through or call `Highcharts.chart()` directly. this reference covers the Highcharts config options most relevant to TRMNL e-ink displays.
+when Chartkick's options aren't enough, use the `library` pass-through or call `Highcharts.chart()` directly. this reference covers the Highcharts config options most relevant to TRMNL ePaper displays.
 
 #### chart types (via `chart.type` or `series[].type`)
 
@@ -1211,7 +1214,7 @@ when Chartkick's options aren't enough, use the `library` pass-through or call `
 | `pie` | proportions | use `innerSize: '50%'` for donut |
 | `scatter` | X/Y point plots | no line between points |
 | `gauge` | speedometer dial | requires `highcharts-more.js` |
-| `solidgauge` | filled arc gauge | requires `highcharts-more.js`. great for e-ink dashboards |
+| `solidgauge` | filled arc gauge | requires `highcharts-more.js`. great for ePaper dashboards |
 | `waterfall` | cumulative gain/loss | financial data. `isSum`/`isIntermediateSum` for totals |
 | `heatmap` | grid color coding | requires `modules/heatmap.js`. works on 4-bit with grays |
 | `bullet` | target vs actual | requires `modules/bullet.js`. compact KPI comparison |
@@ -1248,7 +1251,7 @@ xAxis: {
     format: '{value:%b %d}'
   },
 
-  gridLineWidth: 0,        // hide vertical grid (usually best for e-ink)
+  gridLineWidth: 0,        // hide vertical grid (usually best for ePaper)
 
   plotBands: [{
     from: 2,
@@ -1306,7 +1309,7 @@ plotOptions: {
       format: '{y}',
       style: { fontSize: '10px', fontWeight: 'normal', color: '#000' }
     },
-    animation: false,       // ALWAYS false for e-ink
+    animation: false,       // ALWAYS false for ePaper
     enableMouseTracking: false
   },
 
@@ -1526,7 +1529,7 @@ Highcharts.chart('container', {
 });
 ```
 
-#### e-ink grayscale palette
+#### ePaper grayscale palette
 
 for grayscale-only devices (and as a safe default when targeting mixed device fleets), use these grayscale values for 4-bit displays. if your target devices support color and the framework supplement documents chromatic palette support, you may use real colors in chart configs — but pattern-fill grayscale always renders correctly everywhere:
 
@@ -1544,7 +1547,7 @@ const piePalette = ['#000', '#444', '#888', '#bbb', '#ddd', '#fff'];
 <script src="https://trmnl.com/js/highcharts/12.3.0/pattern-fill.js"></script>
 ```
 ```javascript
-const einkPatternColors = [
+const epaperPatternColors = [
   '#000000',
   { pattern: { image: 'https://trmnl.com/images/grayscale/gray-2.png', width: 12, height: 12 } },
   { pattern: { image: 'https://trmnl.com/images/grayscale/gray-4.png', width: 12, height: 12 } },
@@ -1552,8 +1555,8 @@ const einkPatternColors = [
   '#FFFFFF'
 ];
 
-plotOptions: { pie: { colors: einkPatternColors } }
-series: [{ color: einkPatternColors[1], data: myData }]
+plotOptions: { pie: { colors: epaperPatternColors } }
+series: [{ color: epaperPatternColors[1], data: myData }]
 ```
 
 available pattern images (1-bit): `gray-1.png` (darkest) through `gray-7.png` (lightest) at `https://trmnl.com/images/grayscale/`
@@ -1953,7 +1956,7 @@ for each size you're about to build, answer these questions BEFORE writing HTML:
 
 ---
 
-## 16. DESIGN PHILOSOPHY FOR E-INK
+## 16. DESIGN PHILOSOPHY FOR ePaper
 
 ### hierarchy through weight and space (color is a bonus, not a crutch)
 design primarily for weight, space, and contrast — color availability depends on framework version and device. here's what always works:
@@ -1979,12 +1982,12 @@ a user glances at their TRMNL for ~3 seconds. they should instantly understand:
 
 ### hard rules
 
-- **no custom styles** — never use inline `style="..."` attributes or `<style>` blocks. the framework provides all the classes you need. custom styles bypass the framework, break consistency, and won't render predictably on e-ink. the only exception: chart libraries (Highcharts/Chartkick) and MapLibre GL JS (TRMNLMaps) that require inline styles for rendering.
-- **no emojis** — e-ink displays have no emoji font support. emoji characters render as missing glyphs (empty boxes). use text or SVG icons instead.
-- **image-dither on content images** — always add the `image-dither` class to `<img>` tags displaying photos, logos, or dynamic images: `<img class="image image-dither" src="...">`. without it, images look washed out on e-ink. the only exception is small title_bar icons (24×24 SVGs) which don't need dithering.
+- **no custom styles** — never use inline `style="..."` attributes or `<style>` blocks. the framework provides all the classes you need. custom styles bypass the framework, break consistency, and won't render predictably on ePaper. the only exception: chart libraries (Highcharts/Chartkick) and MapLibre GL JS (TRMNLMaps) that require inline styles for rendering.
+- **no emojis** — ePaper displays have no emoji font support. emoji characters render as missing glyphs (empty boxes). use text or SVG icons instead.
+- **image-dither on content images** — always add the `image-dither` class to `<img>` tags displaying photos, logos, or dynamic images: `<img class="image image-dither" src="...">`. without it, images look washed out on ePaper. the only exception is small title_bar icons (24×24 SVGs) which don't need dithering.
 
 ### anti-patterns to avoid
-- **walls of text** — e-ink is for glanceable data, not reading
+- **walls of text** — ePaper is for glanceable data, not reading
 - **too many metrics** — pick the 3-5 most important
 - **tiny text everywhere** — if you can't read it at arm's length, it's too small
 - **inline styles when framework classes exist** — use the framework (see hard rules above)
@@ -1993,11 +1996,11 @@ a user glances at their TRMNL for ~3 seconds. they should instantly understand:
 - **forgetting `<div class="meta"></div>`** in items — always include it
 - **assuming colors exist (or don't) without checking the supplement** — color availability is framework-version-dependent. consult the framework supplement for the chromatic palette and label variants (if any) before using or dismissing color. when targeting grayscale-only devices, rely on weight, space, and label styles (--inverted, --outline) for differentiation.
 - **raw CSS `color: gray` or `background: #555`** — on 1-bit these become pure black or white. use framework classes (`bg--gray-30`, `text--gray-30`, `label--gray`) which use pattern PNGs
-- **CSS `opacity`** — no transparency on e-ink. posterizes unpredictably
+- **CSS `opacity`** — no transparency on ePaper. posterizes unpredictably
 - **CSS `box-shadow`** — soft shadows become ugly blobs. use `border` or `outline`
 - **CSS `linear-gradient()`** — posterizes into hard bands. use pattern PNGs if you need a gradient effect
 - **`image-dither` on icons/UI** — dithering is for photos. icons and text need hard crisp edges
-- **emojis in markup** — renders as empty boxes on e-ink (see hard rules above)
+- **emojis in markup** — renders as empty boxes on ePaper (see hard rules above)
 - **using flex with percentage widths for proportional splits** — use `grid` with `col--span-{N}` instead
 - **URL-based title_bar icons** — network requests can fail. use inline SVG with `base64_encode` filter
 - **same layout axis for all sizes** — half_horizontal needs rows, half_vertical needs columns
@@ -2018,7 +2021,7 @@ best for: events, tasks, feeds, notifications, any list of similar items.
 <div class="layout">
   <div class="columns">
     <div class="column">
-      <span class="label label--medium group-header" data-group-header="true">{{ date_label }}</span>
+      <span class="label group-header" data-group-header="true">{{ date_label }}</span>
       {% for event in events %}
       <div class="item">
         <div class="meta">
@@ -2307,14 +2310,14 @@ uses Highcharts pie with TRMNL pattern-fill PNGs for 1-bit compatibility, paired
           <div class="meta"></div>
           <div class="content">
             <span class="value value--small value--tnums" data-value-format="true">{{ worldPopulation }}</span>
-            <span class="label label--xsmall">World Pop</span>
+            <span class="label label--small">World Pop</span>
           </div>
         </div>
         <div class="item">
           <div class="meta"></div>
           <div class="content">
             <span class="value value--small value--tnums">{{ totalCountries }}</span>
-            <span class="label label--xsmall">Countries</span>
+            <span class="label label--small">Countries</span>
           </div>
         </div>
       </div>
@@ -2705,6 +2708,8 @@ every field must have: `keyname`, `field_type`, `name`
   learn_more_url: https://trmnl.com
 ```
 
+the author bio `description` is the public recipe page text and link preview. a published recipe needs at least 42 words there to appear in search engines.
+
 **authenticated dropdown (xhrSelect via server-side `remote:`):**
 
 use a `remote:` block instead of `endpoint:` when the request must run on TRMNL's servers — e.g. to send an auth or OAuth token. TRMNL makes the call for you and substitutes `{{ oauth_access_token }}` once OAuth is connected (it also auto-refreshes the token). `endpoint:` fetches from the browser and cannot send server-side secrets.
@@ -2778,14 +2783,12 @@ TRMNL Framework 3.3 ships `TRMNLMaps`, a MapLibre GL JS adapter in the plugin ru
 <link href="https://trmnl.com/js/maplibre-gl/5.24.0/maplibre-gl.css" rel="stylesheet">
 
 <!-- an empty, id'd container with the map class; it fills whatever the layout hands it -->
-<div class="view view--full">
-  <div class="layout layout--col gap--small">
-    <div id="map" class="map stretch w--full"></div>
-  </div>
-  <div class="title_bar">
-    <img class="image image--adaptive" src="https://trmnl.com/images/plugins/trmnl--render.svg" alt="TRMNL">
-    <span class="title">Map</span>
-  </div>
+<div class="layout layout--col gap--small">
+  <div id="map" class="map stretch w--full"></div>
+</div>
+<div class="title_bar">
+  <img class="image image--adaptive" src="https://trmnl.com/images/plugins/trmnl--render.svg" alt="TRMNL">
+  <span class="title">Map</span>
 </div>
 ```
 

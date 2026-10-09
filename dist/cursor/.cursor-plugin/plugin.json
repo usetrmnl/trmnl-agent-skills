@@ -1,19 +1,22 @@
 {
   "name": "trmnl",
-  "version": "0.2.0",
-  "description": "TRMNL agent skill — verbatim mirror of core AI assistant prompts",
+  "displayName": "TRMNL",
+  "version": "0.4.0",
+  "description": "Design TRMNL ePaper screens with the full TRMNL design system, and run your displays through the TRMNL MCP server.",
   "author": {
     "name": "TRMNL"
   },
-  "homepage": "https://github.com/usetrmnl/trmnl-agent-skills",
+  "homepage": "https://trmnl.com",
   "repository": "https://github.com/usetrmnl/trmnl-agent-skills",
   "license": "MIT",
   "keywords": [
     "trmnl",
+    "epaper",
     "e-ink",
     "display",
     "plugins",
     "agent-skills"
   ],
-  "skills": "./skills/"
+  "skills": "./skills/",
+  "logo": "assets/logo.svg"
 }

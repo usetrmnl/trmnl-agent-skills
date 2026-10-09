@@ -5,15 +5,15 @@
     "email": "hello@trmnl.com"
   },
   "metadata": {
-    "description": "Verbatim mirror of TRMNL's production AI assistant prompts, packaged as a Cursor plugin",
-    "version": "0.1.0"
+    "description": "TRMNL plugins for Cursor",
+    "version": "0.4.0"
   },
   "plugins": [
     {
       "name": "trmnl",
       "source": "./dist/cursor",
-      "description": "TRMNL agent skill",
-      "version": "0.1.0",
+      "description": "Design TRMNL ePaper screens with the full TRMNL design system, and run your displays through the TRMNL MCP server.",
+      "version": "0.4.0",
       "category": "developer-tools",
       "tags": ["trmnl", "epaper", "plugins", "skills"]
     }

@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 # Generates per-harness skill outputs into dist/ from skills/<name>/SKILL.md.
-# Targets: Claude Code, Cursor, Codex CLI, Gemini CLI, GitHub Copilot, Hermes.
+# Targets: Claude Code, Cursor, Codex CLI, Gemini CLI, GitHub Copilot.
 #
 # Each non-Claude harness gets its references/ and assets/ bundled into a
 # sibling directory (refs/ and assets/) with relative links rewritten to
@@ -19,7 +19,9 @@ ROOT       = File.expand_path('..', __dir__)
 SOURCE_DIR = File.join(ROOT, 'skills')
 DIST_DIR   = ENV.fetch('TRMNL_DIST_DIR', File.join(ROOT, 'dist'))
 REPO_URL   = 'https://github.com/usetrmnl/trmnl-agent-skills'
-PLUGIN_VER = '0.2.0'
+PLUGIN_VER = '0.4.0'
+PLUGIN_DESCRIPTION = 'Design TRMNL ePaper screens with the full TRMNL design system, and run your displays through the TRMNL MCP server.'
+MCP_SERVER_URL = 'https://trmnl.com/mcp'
 
 # --- skill parsing -----------------------------------------------------------
 
@@ -87,27 +89,29 @@ def emit_claude_code(skills)
 
   manifest = {
     'name'        => 'trmnl',
+    'displayName' => 'TRMNL',
     'version'     => PLUGIN_VER,
-    'description' => 'TRMNL agent skill — verbatim mirror of core AI assistant prompts',
-    'homepage'    => REPO_URL,
+    'description' => PLUGIN_DESCRIPTION,
+    'author'      => { 'name' => 'TRMNL' },
+    'homepage'    => 'https://trmnl.com',
     'repository'  => REPO_URL,
     'license'     => 'MIT',
-    'keywords'    => %w[trmnl e-ink display plugins agent-skills],
-    'skills'      => './skills/'
+    'privacyPolicyUrl' => 'https://trmnl.com/privacy',
+    'termsOfServiceUrl' => 'https://trmnl.com/terms',
+    'documentationUrl' => 'https://help.trmnl.com/en/articles/17432548-mcp-server',
+    'supportUrl'  => 'https://help.trmnl.com',
+    'icon'        => './.claude-plugin/trmnl-icon.png',
+    'keywords'    => %w[trmnl epaper e-ink display plugins agent-skills],
+    'skills'      => './skills/',
+    'mcpServers'  => { 'trmnl' => { 'type' => 'http', 'url' => MCP_SERVER_URL } }
   }
   write_file(File.join(out, '.claude-plugin', 'plugin.json'),
              JSON.pretty_generate(manifest) + "\n")
+  FileUtils.cp(File.join(ROOT, 'templates', 'claude-code', 'README.md'), File.join(out, 'README.md'))
+  FileUtils.cp(File.join(ROOT, 'templates', 'claude-code', 'icon.png'), File.join(out, '.claude-plugin', 'trmnl-icon.png'))
 
   FileUtils.mkdir_p(File.join(out, 'skills'))
   skills.each { |s| FileUtils.cp_r(s[:dir], File.join(out, 'skills')) }
-end
-
-# --- hermes: native skills directory ----------------------------------------
-
-def emit_hermes(skills)
-  out = File.join(DIST_DIR, 'hermes', 'skills')
-  FileUtils.mkdir_p(out)
-  skills.each { |s| FileUtils.cp_r(s[:dir], out) }
 end
 
 # --- cursor: plugin manifest + skills/ + mcp.json (Cursor 2.5+) ------------
@@ -117,18 +121,25 @@ def emit_cursor(skills)
 
   manifest = {
     'name'        => 'trmnl',
+    'displayName' => 'TRMNL',
     'version'     => PLUGIN_VER,
-    'description' => 'TRMNL agent skill — verbatim mirror of core AI assistant prompts',
+    'description' => PLUGIN_DESCRIPTION,
     'author'      => { 'name' => 'TRMNL' },
-    'homepage'    => REPO_URL,
+    'homepage'    => 'https://trmnl.com',
     'repository'  => REPO_URL,
     'license'     => 'MIT',
-    'keywords'    => %w[trmnl e-ink display plugins agent-skills],
-    'skills'      => './skills/'
+    'keywords'    => %w[trmnl epaper e-ink display plugins agent-skills],
+    'skills'      => './skills/',
+    'logo'        => 'assets/logo.svg'
   }
   write_file(File.join(out, '.cursor-plugin', 'plugin.json'),
              JSON.pretty_generate(manifest) + "\n")
+  write_file(File.join(out, 'mcp.json'),
+             JSON.pretty_generate('mcpServers' => { 'trmnl' => { 'url' => MCP_SERVER_URL } }) + "\n")
 
+  FileUtils.mkdir_p(File.join(out, 'assets'))
+  FileUtils.cp(File.join(ROOT, 'templates', 'cursor', 'logo.svg'), File.join(out, 'assets', 'logo.svg'))
+  FileUtils.cp(File.join(ROOT, 'templates', 'cursor', 'README.md'), File.join(out, 'README.md'))
   FileUtils.mkdir_p(File.join(out, 'skills'))
   skills.each { |s| FileUtils.cp_r(s[:dir], File.join(out, 'skills')) }
 end
@@ -171,6 +182,18 @@ def emit_gemini(skills)
   doc += gemini_imports_section(skills)
   write_file(File.join(out, 'GEMINI.md'), doc)
   skills.each { |s| copy_skill_subdirs(s, File.join(out, 'refs'), File.join(out, 'assets')) }
+end
+
+# The Gemini CLI extensions gallery reads gemini-extension.json from the repository root only.
+def emit_gemini_extension
+  manifest = {
+    'name'            => 'trmnl',
+    'version'         => PLUGIN_VER,
+    'description'     => PLUGIN_DESCRIPTION,
+    'mcpServers'      => { 'trmnl' => { 'httpUrl' => MCP_SERVER_URL } },
+    'contextFileName' => 'dist/gemini/GEMINI.md'
+  }
+  write_file(File.join(ROOT, 'gemini-extension.json'), JSON.pretty_generate(manifest) + "\n")
 end
 
 def gemini_imports_section(skills)
@@ -231,10 +254,10 @@ def main
 
   reset_dist
   emit_claude_code(skills)
-  emit_hermes(skills)
   emit_cursor(skills)
   emit_codex(skills)
   emit_gemini(skills)
+  emit_gemini_extension
   emit_copilot(skills)
 
   puts "Generated #{skills.size} skill(s) into #{DIST_DIR}"

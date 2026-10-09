@@ -39,5 +39,20 @@ copy_with_banner "$CORE/app/services/ai_assistant/agent_prompt.md"        "agent
 copy_with_banner "$CORE/app/services/ai_assistant/framework_v3_guide.md"  "framework_v3_guide.md"  "framework v3 supplement"
 copy_with_banner "$CORE/app/tools/design_system/template_guide.md"        "template_guide.md"      "design system template guide"
 
+# Claude Code and Cursor pick up new files only when the plugin version changes.
+if ! git -C "$REPO_ROOT" diff --quiet -- skills/trmnl/references; then
+  committed=$(git -C "$REPO_ROOT" show HEAD:bin/generate | sed -n "s/^PLUGIN_VER = '\(.*\)'$/\1/p")
+  current=$(sed -n "s/^PLUGIN_VER = '\(.*\)'$/\1/p" "$REPO_ROOT/bin/generate")
+  if [[ "$current" == "$committed" ]]; then
+    next=$(echo "$current" | awk -F. '{ printf "%d.%d.%d", $1, $2, $3 + 1 }')
+    sed -i.bak "s/^PLUGIN_VER = '$current'$/PLUGIN_VER = '$next'/" "$REPO_ROOT/bin/generate"
+    for manifest in .claude-plugin/marketplace.json .cursor-plugin/marketplace.json; do
+      sed -i.bak "s/\"version\": \"$current\"/\"version\": \"$next\"/g" "$REPO_ROOT/$manifest"
+    done
+    find "$REPO_ROOT/bin" "$REPO_ROOT/.claude-plugin" "$REPO_ROOT/.cursor-plugin" -name '*.bak' -delete
+    echo "  references changed: version $current -> $next"
+  fi
+fi
+
 echo ""
 echo "✓ sync complete. now run: bin/generate"
