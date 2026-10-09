@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 # Generates per-harness skill outputs into dist/ from skills/<name>/SKILL.md.
-# Targets: Claude Code, Cursor, Codex CLI, Gemini CLI, GitHub Copilot.
+# Targets: Claude Code, Cursor, ChatGPT, Codex CLI, Gemini CLI, GitHub Copilot.
 #
 # Each non-Claude harness gets its references/ and assets/ bundled into a
 # sibling directory (refs/ and assets/) with relative links rewritten to
@@ -144,6 +144,25 @@ def emit_cursor(skills)
   skills.each { |s| FileUtils.cp_r(s[:dir], File.join(out, 'skills')) }
 end
 
+# --- chatgpt: Agent Plugins package, zipped and uploaded at platform.openai.com/plugins
+
+def emit_chatgpt(skills)
+  out = File.join(DIST_DIR, 'chatgpt')
+
+  manifest = JSON.parse(File.read(File.join(ROOT, 'templates', 'chatgpt', 'plugin.json')))
+                 .merge('version' => PLUGIN_VER, 'description' => PLUGIN_DESCRIPTION)
+  write_file(File.join(out, 'plugin.json'), JSON.pretty_generate(manifest) + "\n")
+  # The upload check ignores an mcp.json without $schema, then refuses the review test cases for having no server.
+  write_file(File.join(out, 'mcp.json'),
+             JSON.pretty_generate('$schema'    => 'https://agent-plugins.org/schemas/1.0.0/mcp.schema.json',
+                                  'mcpServers' => { 'trmnl' => { 'type' => 'streamable-http', 'url' => MCP_SERVER_URL } }) + "\n")
+
+  FileUtils.mkdir_p(File.join(out, 'assets'))
+  FileUtils.cp(File.join(ROOT, 'templates', 'chatgpt', 'logo.png'), File.join(out, 'assets', 'logo.png'))
+  FileUtils.mkdir_p(File.join(out, 'skills'))
+  skills.each { |s| FileUtils.cp_r(s[:dir], File.join(out, 'skills')) }
+end
+
 # --- codex / gemini: AGENTS.md / GEMINI.md + sibling refs/ ------------------
 
 def aggregated_markdown(skills, title, harness, refs_prefix:, assets_prefix:)
@@ -255,6 +274,7 @@ def main
   reset_dist
   emit_claude_code(skills)
   emit_cursor(skills)
+  emit_chatgpt(skills)
   emit_codex(skills)
   emit_gemini(skills)
   emit_gemini_extension

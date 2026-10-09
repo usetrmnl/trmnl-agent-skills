@@ -1,0 +1,98 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "trmnl",
+  "version": "0.4.0",
+  "description": "Design TRMNL ePaper screens with the full TRMNL design system, and run your displays through the TRMNL MCP server.",
+  "author": {
+    "name": "TRMNL",
+    "url": "https://trmnl.com"
+  },
+  "homepage": "https://trmnl.com",
+  "repository": "https://github.com/usetrmnl/trmnl-agent-skills",
+  "license": "MIT",
+  "keywords": [
+    "trmnl",
+    "epaper",
+    "e-ink",
+    "display",
+    "dashboard"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "TRMNL",
+        "shortDescription": "Run your ePaper displays",
+        "longDescription": "TRMNL is a calm ePaper screen for the things that matter: your calendar, the weather, the next train, your own numbers. This plugin lets ChatGPT look after it for you.\n\n**Try asking**\n- \"What's on my kitchen TRMNL right now, and what's up next?\"\n- \"Show my calendar on the office display on weekdays from 9 to 5, and Hacker News the rest of the time.\"\n- \"Build me a screen with today's signups and open support tickets.\"\n- \"Why is my TRMNL still showing yesterday's weather?\"\n\n**What ChatGPT can do**\n- Check on your devices: battery, logs, what's showing and what's coming up\n- Plan your playlists: add, reorder, schedule and remove screens, or split one screen into a mashup\n- Find plugins and community recipes, and set them up for you\n- Design your own screens in HTML and Liquid with the TRMNL framework, and preview them before they reach a device\n- Send numbers from another tool to a private plugin, whenever you want them fresh\n\n**You stay in charge.** When you connect, you choose what ChatGPT may do. Reading, changing content, changing devices, deleting, your profile and apps are separate switches, and deleting starts off. Every tool is marked read-only or destructive, so ChatGPT asks before it changes anything, and you can see or revoke the connection any time under Account, then Developer, then Connected agents.\n\nSetup guide: https://help.trmnl.com/en/articles/17432548-mcp-server",
+        "developerName": "TRMNL",
+        "category": "Productivity",
+        "websiteURL": "https://trmnl.com",
+        "supportURL": "https://help.trmnl.com",
+        "privacyPolicyURL": "https://trmnl.com/privacy",
+        "termsOfServiceURL": "https://trmnl.com/terms",
+        "logo": "./assets/logo.png",
+        "brandColor": "#F8654B",
+        "defaultPrompt": [
+          "What's on my TRMNL right now?",
+          "Build me a screen with today's numbers.",
+          "Show my calendar on weekdays from 9 to 5."
+        ]
+      },
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Check what a device shows",
+              "prompt": "What's on my Kitchen OG TRMNL right now, and what's up next?",
+              "tools_triggered": "AccountDevicesReadTool, AccountPlaylistsReadTool",
+              "expected_behavior": "Lists the Kitchen OG's playlist (Team KPIs, Days Left This Year, Hacker News, Flip Clock) and says which screen is showing and which comes next, from the device forecast."
+            },
+            {
+              "description": "Device health",
+              "prompt": "Is my Kitchen OG online and how is its battery?",
+              "tools_triggered": "AccountDevicesReadTool",
+              "expected_behavior": "Reports the device's last check-in time (within the last 15 minutes), battery level and Wi-Fi signal."
+            },
+            {
+              "description": "Read a private plugin's data",
+              "prompt": "What numbers is my Team KPIs screen showing?",
+              "tools_triggered": "AccountPluginSettingsReadTool",
+              "expected_behavior": "Reads the Team KPIs merge variables and answers with team Support, 42 signups and 7 open tickets."
+            },
+            {
+              "description": "Update a screen's data",
+              "prompt": "Set the open tickets on my Team KPIs screen to 12.",
+              "tools_triggered": "AccountPluginSettingsWriteTool",
+              "expected_behavior": "Asks to confirm the change, then updates the Team KPIs merge variable open_tickets to 12 and confirms the new value."
+            },
+            {
+              "description": "Find and install a recipe",
+              "prompt": "Find a clock recipe and add it to my Office X display.",
+              "tools_triggered": "AccountRecipesReadTool, AccountRecipesWriteTool",
+              "expected_behavior": "Searches recipes for clocks, proposes one (for example Flip Clock), asks to confirm, installs it and adds it to the Office X playlist."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Unrelated request",
+              "prompt": "What's the weather in Paris tomorrow?"
+            },
+            {
+              "description": "Another user's account",
+              "prompt": "Show me the devices of the TRMNL user ryan@example.com."
+            },
+            {
+              "description": "Purchase",
+              "prompt": "Buy me a new TRMNL X and ship it to my office."
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "No payments or purchases. The plugin reads and changes the user's own TRMNL account."
+      },
+      "publication": {
+        "countries": [],
+        "release_notes": "First release: the TRMNL MCP server and the TRMNL design system skill."
+      }
+    }
+  }
+}
