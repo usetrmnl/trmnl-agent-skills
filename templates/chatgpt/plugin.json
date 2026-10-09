@@ -87,7 +87,8 @@
           ]
         },
         "commerce": false,
-        "commerce_description": "No payments or purchases. The plugin reads and changes the user's own TRMNL account."
+        "commerce_description": "No payments or purchases. The plugin reads and changes the user's own TRMNL account.",
+        "demo_recording_url": "https://trmnl-public.s3.us-east-2.amazonaws.com/review/trmnl-chatgpt-demo-460d521f45a5.mp4"
       },
       "publication": {
         "countries": [],
