@@ -1,11 +1,12 @@
 {
   "name": "trmnl",
+  "displayName": "TRMNL",
   "version": "0.4.0",
   "description": "Design TRMNL ePaper screens with the full TRMNL design system, and run your displays through the TRMNL MCP server.",
   "author": {
     "name": "TRMNL"
   },
-  "homepage": "https://github.com/usetrmnl/trmnl-agent-skills",
+  "homepage": "https://trmnl.com",
   "repository": "https://github.com/usetrmnl/trmnl-agent-skills",
   "license": "MIT",
   "keywords": [
@@ -16,5 +17,6 @@
     "plugins",
     "agent-skills"
   ],
-  "skills": "./skills/"
+  "skills": "./skills/",
+  "logo": "assets/logo.svg"
 }
