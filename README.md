@@ -26,6 +26,31 @@ Source of truth: [`skills/trmnl/`](skills/trmnl/). Generated outputs (committed 
 
 Full install: [`install/README.md`](install/README.md).
 
+## Use it across a team (Claude Code)
+
+To give everyone working in a repository the TRMNL plugin, commit this to the repository's `.claude/settings.json`:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "trmnl-agent-skills": {
+      "source": { "source": "github", "repo": "usetrmnl/trmnl-agent-skills" }
+    }
+  },
+  "enabledPlugins": {
+    "trmnl@trmnl-agent-skills": true
+  }
+}
+```
+
+Each teammate then trusts the folder and runs this once:
+
+```bash
+claude plugin install trmnl@trmnl-agent-skills --scope project
+```
+
+New versions arrive when the plugin's version changes, which `bin/sync-from-core` bumps whenever the reference files change.
+
 ## Where TRMNL is listed
 
 The TRMNL MCP server (`https://trmnl.com/mcp`, OAuth) is listed in:
