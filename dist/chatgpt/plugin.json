@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "trmnl",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Design TRMNL ePaper screens with the full TRMNL design system, and run your displays through the TRMNL MCP server.",
   "author": {
     "name": "TRMNL",

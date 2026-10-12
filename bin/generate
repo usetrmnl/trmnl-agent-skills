@@ -19,7 +19,7 @@ ROOT       = File.expand_path('..', __dir__)
 SOURCE_DIR = File.join(ROOT, 'skills')
 DIST_DIR   = ENV.fetch('TRMNL_DIST_DIR', File.join(ROOT, 'dist'))
 REPO_URL   = 'https://github.com/usetrmnl/trmnl-agent-skills'
-PLUGIN_VER = '0.4.0'
+PLUGIN_VER = '0.4.1'
 PLUGIN_DESCRIPTION = 'Design TRMNL ePaper screens with the full TRMNL design system, and run your displays through the TRMNL MCP server.'
 MCP_SERVER_URL = 'https://trmnl.com/mcp'
 
