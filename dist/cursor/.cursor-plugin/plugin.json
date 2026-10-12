@@ -1,7 +1,7 @@
 {
   "name": "trmnl",
   "displayName": "TRMNL",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Design TRMNL ePaper screens with the full TRMNL design system, and run your displays through the TRMNL MCP server.",
   "author": {
     "name": "TRMNL"

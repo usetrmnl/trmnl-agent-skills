@@ -385,6 +385,8 @@ alignment: `flex--left`, `flex--right`, `flex--center`, `flex--center-x`, `flex-
 
 stretch: `flex--stretch`, `flex--stretch-x`, `flex--stretch-y`
 
+spacing: `flex--between`, `flex--around`, `flex--evenly`
+
 item-level: `stretch-x`, `stretch-y`, `grow`, `no-shrink`, `self--center`
 
 #### columns — auto-distributed layout
@@ -688,6 +690,8 @@ integrations: `data-content-limiter="true"` (auto-resize), `data-pixel-perfect="
 <span class="text--gray-60">      <!-- lighter gray shade -->
 <span class="text--bold">         <!-- bold -->
 ```
+
+sizes (small → huge): `text--small`, `text--base`, `text--large`, `text--xlarge`, `text--xxlarge`, `text--xxxlarge`, `text--mega`, `text--giga`, `text--tera`, `text--peta`
 
 **gray text on 1-bit** uses a pattern PNG clipped to the text shape (not a CSS color). the framework handles this automatically — always use `text--gray-N` or `label--gray` classes, never `color: #555` in raw CSS. the exact gray-N scale available depends on framework version — see the supplement.
 
@@ -2708,7 +2712,7 @@ every field must have: `keyname`, `field_type`, `name`
   learn_more_url: https://trmnl.com
 ```
 
-the author bio `description` is the public recipe page text and link preview. a published recipe needs at least 42 words there to appear in search engines.
+the author bio `description` is the public recipe page text and link preview. a published recipe needs a description there to appear in search engines.
 
 **authenticated dropdown (xhrSelect via server-side `remote:`):**
 
@@ -2854,3 +2858,24 @@ A second route takes the next step of the chart-series ramp: `TRMNLMaps.route(ma
 - **keep the OpenStreetMap credit.** `watch()` and `attach()` place a framework-styled "© OpenStreetMap contributors" label on every map; it is required by the ODbL.
 - **no custom styles**, same as everywhere: the `.map` container is sized by the layout (`stretch`, `w--full`, `h--*`), never by inline CSS.
 - **labels are framework labels**, not map glyphs; they take the screen's fonts and a text stroke, so do not add your own label elements over the canvas.
+
+## 21. COMPONENT LIBRARY
+
+tested `{% template %}` blocks for common screens, previewed on the TRMNL OG and the TRMNL X at https://components.trmnl.com. paste a block's template into shared markup, then render it from any view. options are render arguments, not custom fields.
+
+| template | render it with |
+|---|---|
+| `trmnl_stat` | `{% render "trmnl_stat", value: value, label: label, unit: unit, delta: delta, delta_dir: delta_dir %}` |
+| `trmnl_list` | `{% render "trmnl_list", items: items %}` |
+| `trmnl_table` | `{% render "trmnl_table", columns: columns, rows: rows, align: align %}` |
+| `trmnl_progress` | `{% render "trmnl_progress", value: value, label: label, total: total %}` |
+| `trmnl_sparkline` | `{% render "trmnl_sparkline", series: series, title: title, unit: unit %}` (SVG, no chart library) |
+| `trmnl_badge` | `{% render "trmnl_badge", badges: badges %}` |
+| `trmnl_text` | `{% render "trmnl_text", title: title, body: body %}` |
+| `trmnl_divider` | `{% render "trmnl_divider", title: title %}` |
+| `trmnl_chart` | `{% render "trmnl_chart", data: data %}`, or a preset such as `trmnl_chart_line`, `trmnl_chart_donut`, `trmnl_chart_waterfall` |
+
+- **render only a template that is in shared markup.** a missing template prints `Liquid error: Template not found` on the screen.
+- **a chart preset needs `trmnl_chart` too.** paste both.
+- **get the template from the source:** https://components.trmnl.com/c/<name>.md has one block's template, arguments and sample data. https://components.trmnl.com/llms.txt lists every block.
+- **the `homey_*` components are alpha.** do not use them outside a Homey plugin.
